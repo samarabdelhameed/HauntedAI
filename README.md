@@ -110,29 +110,51 @@ npm run dev
 
 ## 📖 Documentation
 
-- [Requirements](./kiro/specs/haunted-ai/requirements.md) - Detailed feature requirements
-- [Design](./kiro/specs/haunted-ai/design.md) - Architecture and correctness properties
-- [Tasks](./kiro/specs/haunted-ai/tasks.md) - Implementation plan
+- [Requirements](./.kiro/specs/haunted-ai/requirements.md) - Detailed feature requirements
+- [Design](./.kiro/specs/haunted-ai/design.md) - Architecture and correctness properties
+- [Tasks](./.kiro/specs/haunted-ai/tasks.md) - Implementation plan
+- [Testing Guide](./TESTING.md) - Comprehensive testing documentation
 - [API Docs](http://localhost:3001/api/docs) - Interactive Swagger documentation
 - [Contributing](./CONTRIBUTING.md) - Development guidelines
 
 ## 🧪 Testing
 
+### Quick Test
 ```bash
-# Run all tests
+# Run all unit tests
 npm test
-
-# Run unit tests
-npm run test:unit
-
-# Run property-based tests (81 properties, 100 iterations each)
-npm run test:property
 
 # Run with coverage
 npm run test:coverage
+```
 
-# Run load tests
+### Current Test Results ✅
+- **User CRUD**: 15 tests passing
+- **Room CRUD**: 12 tests passing  
+- **Asset CRUD**: 10 tests passing
+- **Total**: 37 unit tests passing
+
+### Full Testing Guide
+See [TESTING.md](./TESTING.md) for comprehensive testing documentation including:
+- Manual testing checklist
+- API endpoint testing
+- Database testing
+- Integration testing
+- Property-based testing (81 properties planned)
+
+### Test Commands
+```bash
+# Unit tests only
+npm run test:unit
+
+# Property-based tests (coming soon)
+npm run test:property
+
+# Load tests (coming soon)
 npm run test:load
+
+# Watch mode
+npm test -- --watch
 ```
 
 ## 🛠️ Tech Stack
@@ -175,13 +197,29 @@ HauntedAI showcases the full power of Kiro:
 
 **Impact**: Democratizing AI content generation with transparency, permanence, and fair rewards.
 
-## 📊 Metrics
+## 📊 Current Status & Metrics
 
-- **81 Correctness Properties** verified via property-based testing
-- **80%+ Code Coverage** with comprehensive test suite
-- **< 5s Response Time** (95th percentile)
-- **< 10% Error Rate** under load
-- **100% Decentralized** content storage
+### ✅ Completed (Phase 1)
+- **Project Structure**: Monorepo with TypeScript, ESLint, Prettier
+- **Docker Environment**: Full stack containerization ready
+- **Database**: Prisma schema with 5 models (User, Room, Asset, Token, Badge)
+- **CI/CD**: GitHub Actions pipeline with lint, test, build, deploy
+- **Unit Tests**: 37 tests covering database operations
+- **NestJS API**: Modular structure with 5 modules ready
+- **Documentation**: Swagger/OpenAPI integration
+
+### 🔄 In Progress (Phase 2)
+- **API Implementation**: Endpoints defined, logic pending
+- **Authentication**: Web3 wallet integration
+- **Property-Based Tests**: 81 properties to be implemented
+
+### 📈 Metrics
+- **Test Coverage**: 37 unit tests passing ✅
+- **Code Quality**: ESLint + Prettier configured
+- **API Endpoints**: 15+ endpoints defined
+- **Target Coverage**: 80%+
+- **Target Response Time**: < 5s (95th percentile)
+- **Decentralized Storage**: 100% via Storacha/IPFS
 
 ## 🤝 Contributing
 

@@ -6,6 +6,7 @@ import { AssetsModule } from './modules/assets/assets.module';
 import { TokensModule } from './modules/tokens/tokens.module';
 import { UsersModule } from './modules/users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { HealthController } from './health.controller';
 
 @Module({
   imports: [
@@ -16,5 +17,6 @@ import { PrismaModule } from './prisma/prisma.module';
     TokensModule,
     UsersModule,
   ],
+  controllers: [HealthController],
 })
 export class AppModule {}
