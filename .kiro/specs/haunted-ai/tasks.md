@@ -29,7 +29,7 @@
   - Set up branch protection rules
   - _Requirements: 15.1, 15.2_
 
-- [ ] 1.5 Write unit tests for database operations
+- [x] 1.5 Write unit tests for database operations
   - Test user CRUD operations
   - Test room CRUD operations
   - Test asset CRUD operations
