@@ -36,7 +36,7 @@
   - _Requirements: 8.1, 8.2_
 
 - [ ] 2. Backend API Gateway (NestJS)
-- [ ] 2.1 Create NestJS application structure
+- [x] 2.1 Create NestJS application structure
   - Initialize NestJS project in apps/api
   - Set up modules: auth, rooms, assets, tokens, users
   - Configure global exception filters and interceptors
