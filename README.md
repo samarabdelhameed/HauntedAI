@@ -106,6 +106,9 @@ node test-content-discovery.js
 
 # Run E2E user scenario test
 node apps/api/test-e2e-user-scenario.js
+
+# Run token rewards manual test
+node apps/api/test-token-rewards-manual.js
 ```
 
 ## 📖 User Journey
@@ -358,6 +361,52 @@ Seamless integration with external services:
 ✓ should handle rapid log emission (10 ms)
 ✓ should handle logs exceeding buffer limit conceptually (435 ms)
 ```
+
+### Property 30: Upload Reward Amount
+
+**Property**: _For any_ content upload by a user, their HHCW token balance should increase by exactly 10 tokens.
+
+**Validates**: Requirements 9.1
+
+```typescript
+✓ should reward exactly 10 tokens for any content upload (20 ms)
+✓ should record upload rewards with correct reason (10 ms)
+```
+
+**Test Results**: 100 iterations per property, all passing ✅
+
+### Property 31: View Reward Amount
+
+**Property**: _For any_ content view by a user, their HHCW token balance should increase by exactly 1 token.
+
+**Validates**: Requirements 9.2
+
+```typescript
+✓ should reward exactly 1 token for any content view (9 ms)
+✓ should record view rewards with correct reason (7 ms)
+```
+
+**Test Results**: 100 iterations per property, all passing ✅
+
+### Property 34: Balance Calculation Correctness
+
+**Property**: _For any_ user, the returned balance should equal the sum of all amounts in their token_tx records.
+
+**Validates**: Requirements 9.5
+
+```typescript
+✓ should calculate balance as sum of all transaction amounts (13 ms)
+✓ should handle empty transaction history with zero balance (7 ms)
+✓ should maintain balance consistency across multiple queries (8 ms)
+✓ should correctly sum positive and negative transactions (7 ms)
+```
+
+**Test Results**: 100 iterations per property, all passing ✅
+
+**Token Reward System:**
+- Upload (Story/Image/Code): **10 HHCW tokens**
+- View (Story/Image/Code): **1 HHCW token**
+- Referral: **50 HHCW tokens**
 
 ## 🔧 Technology Stack
 

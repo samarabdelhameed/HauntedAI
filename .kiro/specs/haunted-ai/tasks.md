@@ -98,7 +98,7 @@
   - POST /api/v1/tokens/reward - Internal endpoint for rewarding users
   - _Requirements: 9.5_
 
-- [ ] 2.11 Write property test for token rewards
+- [x] 2.11 Write property test for token rewards
   - **Property 30: Upload reward amount**
   - **Property 31: View reward amount**
   - **Property 34: Balance calculation correctness**
