@@ -508,9 +508,20 @@ http://localhost:3001/api/docs
 | `GET` | `/api/v1/assets` | List assets |
 | `GET` | `/api/v1/explore` | Public content discovery |
 
+## 📚 Documentation
+
+Complete documentation is available in the [docs/](docs/) folder:
+
+- [Quick Start Guide](docs/QUICKSTART.md)
+- [Testing Documentation](docs/TESTING.md)
+- [E2E Testing Guide](docs/E2E_TESTING_GUIDE.md)
+- [Kiro Integration Guide](docs/KIRO_INTEGRATION.md)
+- [Implementation Checklist](docs/IMPLEMENTATION_CHECKLIST.md)
+- [Full Documentation Index](docs/INDEX.md)
+
 ## 🤝 Contributing
 
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+We welcome contributions! Please see [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) for guidelines.
 
 ### Development Workflow
 
