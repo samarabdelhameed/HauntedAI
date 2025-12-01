@@ -177,42 +177,42 @@
   - Log timeout errors
   - _Requirements: 12.1_
 
-- [ ] 6. StoryAgent Service
-- [ ] 6.1 Create StoryAgent micro-service
+- [x] 6. StoryAgent Service
+- [x] 6.1 Create StoryAgent micro-service
   - Initialize Node.js service with Express
   - Install OpenAI SDK
   - Create POST /generate endpoint
   - Implement health check endpoint
   - _Requirements: 1.1_
 
-- [ ] 6.2 Implement story generation with OpenAI GPT-4
+- [x] 6.2 Implement story generation with OpenAI GPT-4
   - Create spooky system prompt template
   - Call OpenAI API with user input
   - Parse and validate response
   - Add error handling for API failures
   - _Requirements: 1.1_
 
-- [ ] 6.3 Write property test for story generation
+- [x] 6.3 Write property test for story generation
   - **Property 1: Non-empty input generates story**
   - **Validates: Requirements 1.1**
 
-- [ ] 6.4 Integrate story upload to Storacha
+- [x] 6.4 Integrate story upload to Storacha
   - Upload generated story to Storacha
   - Return CID in response
   - Save story metadata to database
   - _Requirements: 1.2_
 
-- [ ] 6.5 Write property test for story storage
+- [x] 6.5 Write property test for story storage
   - **Property 2: Story storage round-trip**
   - **Validates: Requirements 1.2**
 
-- [ ] 6.6 Add retry logic for OpenAI API failures
+- [x] 6.6 Add retry logic for OpenAI API failures
   - Implement exponential backoff for rate limits
   - Handle timeout errors
   - Log all retry attempts
   - _Requirements: 1.4_
 
-- [ ] 6.7 Write property test for story retry logic
+- [x] 6.7 Write property test for story retry logic
   - **Property 4: Story generation retry with backoff**
   - **Validates: Requirements 1.4**
 
