@@ -43,7 +43,7 @@
   - Set up Swagger/OpenAPI documentation
   - _Requirements: 17.1, 17.2_
 
-- [ ] 2.2 Implement authentication service
+- [x] 2.2 Implement authentication service
   - Create Web3 signature verification endpoint (POST /api/v1/auth/login)
   - Implement JWT token generation and validation
   - Create authentication guard for protected routes
