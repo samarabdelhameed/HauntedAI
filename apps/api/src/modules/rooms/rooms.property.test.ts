@@ -5,6 +5,7 @@ import * as fc from 'fast-check';
 
 import { PrismaService } from '../../prisma/prisma.service';
 
+import { RedisService } from './redis.service';
 import { RoomsService } from './rooms.service';
 
 describe('Room Management Property-Based Tests', () => {
@@ -24,6 +25,16 @@ describe('Room Management Property-Based Tests', () => {
               findMany: jest.fn(),
               update: jest.fn(),
             },
+          },
+        },
+        {
+          provide: RedisService,
+          useValue: {
+            publish: jest.fn(),
+            subscribe: jest.fn(),
+            getClient: jest.fn(() => ({
+              publish: jest.fn(),
+            })),
           },
         },
       ],

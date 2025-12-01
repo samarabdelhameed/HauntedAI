@@ -87,7 +87,7 @@
   - GET /api/v1/explore - Public content discovery with pagination
   - _Requirements: 10.1, 10.2_
 
-- [ ] 2.9 Write property test for content discovery
+- [x] 2.9 Write property test for content discovery
   - **Property 35: Filter correctness**
   - **Property 36: Content modal completeness**
   - **Validates: Requirements 10.2, 10.3**

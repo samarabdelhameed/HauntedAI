@@ -89,13 +89,20 @@ npm run dev
 
 ```bash
 # Run all tests
+cd apps/api
 npm test
 
-# Run property-based tests only
+# Run property-based tests only (36 tests)
 npm run test:property
 
 # Run with coverage
 npm run test:coverage
+
+# Run specific property test
+npm test -- assets.property.test.ts --runInBand --no-coverage
+
+# Run E2E content discovery test
+node test-content-discovery.js
 
 # Run E2E user scenario test
 node apps/api/test-e2e-user-scenario.js
@@ -281,6 +288,37 @@ Seamless integration with external services:
 - **PostgreSQL MCP**: Database operations
 
 ## 📊 Property-Based Testing Examples
+
+### Property 35: Filter Correctness (Content Discovery)
+
+**Property**: _For any_ agent type filter applied, all displayed content should have matching agent_type field.
+
+**Validates**: Requirements 10.2
+
+```typescript
+✓ should return only assets matching the specified agent type filter (105 ms)
+✓ should return all assets when no filter is applied (47 ms)
+✓ should filter by roomId correctly (58 ms)
+✓ should apply pagination limits correctly (91 ms)
+```
+
+**Test Results**: 100 iterations per property, all passing ✅
+
+### Property 36: Content Modal Completeness
+
+**Property**: _For any_ content item clicked, the modal should display all fields: story/image, CID, metadata, and timestamp.
+
+**Validates**: Requirements 10.3
+
+```typescript
+✓ should return complete asset details with all required fields (46 ms)
+✓ should include metadata in asset details (24 ms)
+✓ should include timestamp information in asset details (21 ms)
+✓ should return assets with valid CID format for all agent types (19 ms)
+✓ should include file size and type information (20 ms)
+```
+
+**Test Results**: 100 iterations per property, all passing ✅
 
 ### Property 15: Agent Operations Emit Logs
 
