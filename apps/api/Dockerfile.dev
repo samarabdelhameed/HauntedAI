@@ -1,0 +1,22 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+COPY apps/api/package*.json ./apps/api/
+COPY apps/shared/package*.json ./apps/shared/
+
+# Install dependencies
+RUN npm install
+
+# Copy source code
+COPY apps/api ./apps/api
+COPY apps/shared ./apps/shared
+COPY tsconfig.base.json ./
+
+WORKDIR /app/apps/api
+
+EXPOSE 3001
+
+CMD ["npm", "run", "dev"]

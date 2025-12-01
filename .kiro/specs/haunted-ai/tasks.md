@@ -9,13 +9,13 @@
   - Configure ESLint and Prettier for code quality
   - _Requirements: All_
 
-- [ ] 1.2 Set up Docker development environment
+- [x] 1.2 Set up Docker development environment
   - Create docker-compose.dev.yml with PostgreSQL, Redis, and service containers
   - Write Dockerfiles for each service (api, web, agents)
   - Configure environment variable templates (.env.example)
   - _Requirements: 14.1, 15.1_
 
-- [ ] 1.3 Initialize database with Prisma
+- [x] 1.3 Initialize database with Prisma
   - Install Prisma and configure schema.prisma
   - Create migrations for users, rooms, assets, token_tx, badges tables
   - Set up Prisma Client generation

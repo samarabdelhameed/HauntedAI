@@ -1,0 +1,22 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+COPY apps/agents/deploy-agent/package*.json ./apps/agents/deploy-agent/
+COPY apps/shared/package*.json ./apps/shared/
+
+# Install dependencies
+RUN npm install
+
+# Copy source code
+COPY apps/agents/deploy-agent ./apps/agents/deploy-agent
+COPY apps/shared ./apps/shared
+COPY tsconfig.base.json ./
+
+WORKDIR /app/apps/agents/deploy-agent
+
+EXPOSE 3005
+
+CMD ["npm", "run", "dev"]

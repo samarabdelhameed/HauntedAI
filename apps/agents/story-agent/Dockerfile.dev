@@ -1,0 +1,22 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+COPY apps/agents/story-agent/package*.json ./apps/agents/story-agent/
+COPY apps/shared/package*.json ./apps/shared/
+
+# Install dependencies
+RUN npm install
+
+# Copy source code
+COPY apps/agents/story-agent ./apps/agents/story-agent
+COPY apps/shared ./apps/shared
+COPY tsconfig.base.json ./
+
+WORKDIR /app/apps/agents/story-agent
+
+EXPOSE 3002
+
+CMD ["npm", "run", "dev"]

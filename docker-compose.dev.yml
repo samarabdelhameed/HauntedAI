@@ -1,0 +1,213 @@
+version: '3.9'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: hauntedai-postgres
+    environment:
+      POSTGRES_DB: hauntedai_dev
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - hauntedai-network
+
+  # Redis Cache & Message Queue
+  redis:
+    image: redis:7-alpine
+    container_name: hauntedai-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - hauntedai-network
+
+  # API Gateway (NestJS)
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile.dev
+    container_name: hauntedai-api
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://dev:dev@postgres:5432/hauntedai_dev
+      REDIS_URL: redis://redis:6379
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      STORACHA_DID: ${STORACHA_DID}
+      STORACHA_PROOF: ${STORACHA_PROOF}
+      JWT_SECRET: ${JWT_SECRET}
+      API_PORT: 3001
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./apps/api:/app/apps/api
+      - ./apps/shared:/app/apps/shared
+      - /app/node_modules
+      - /app/apps/api/node_modules
+    networks:
+      - hauntedai-network
+    command: npm run dev
+
+  # Orchestrator Service
+  orchestrator:
+    build:
+      context: .
+      dockerfile: apps/agents/orchestrator/Dockerfile.dev
+    container_name: hauntedai-orchestrator
+    environment:
+      NODE_ENV: development
+      REDIS_URL: redis://redis:6379
+      DATABASE_URL: postgresql://dev:dev@postgres:5432/hauntedai_dev
+    depends_on:
+      - redis
+      - postgres
+    volumes:
+      - ./apps/agents/orchestrator:/app/apps/agents/orchestrator
+      - ./apps/shared:/app/apps/shared
+      - /app/node_modules
+    networks:
+      - hauntedai-network
+
+  # StoryAgent Service
+  story-agent:
+    build:
+      context: .
+      dockerfile: apps/agents/story-agent/Dockerfile.dev
+    container_name: hauntedai-story-agent
+    environment:
+      NODE_ENV: development
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      STORACHA_DID: ${STORACHA_DID}
+      STORACHA_PROOF: ${STORACHA_PROOF}
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "3002:3002"
+    depends_on:
+      - redis
+    volumes:
+      - ./apps/agents/story-agent:/app/apps/agents/story-agent
+      - ./apps/shared:/app/apps/shared
+      - /app/node_modules
+    networks:
+      - hauntedai-network
+
+  # AssetAgent Service
+  asset-agent:
+    build:
+      context: .
+      dockerfile: apps/agents/asset-agent/Dockerfile.dev
+    container_name: hauntedai-asset-agent
+    environment:
+      NODE_ENV: development
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      STABILITY_API_KEY: ${STABILITY_API_KEY}
+      STORACHA_DID: ${STORACHA_DID}
+      STORACHA_PROOF: ${STORACHA_PROOF}
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "3003:3003"
+    depends_on:
+      - redis
+    volumes:
+      - ./apps/agents/asset-agent:/app/apps/agents/asset-agent
+      - ./apps/shared:/app/apps/shared
+      - /app/node_modules
+    networks:
+      - hauntedai-network
+
+  # CodeAgent Service
+  code-agent:
+    build:
+      context: .
+      dockerfile: apps/agents/code-agent/Dockerfile.dev
+    container_name: hauntedai-code-agent
+    environment:
+      NODE_ENV: development
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      STORACHA_DID: ${STORACHA_DID}
+      STORACHA_PROOF: ${STORACHA_PROOF}
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "3004:3004"
+    depends_on:
+      - redis
+    volumes:
+      - ./apps/agents/code-agent:/app/apps/agents/code-agent
+      - ./apps/shared:/app/apps/shared
+      - /app/node_modules
+    networks:
+      - hauntedai-network
+
+  # DeployAgent Service
+  deploy-agent:
+    build:
+      context: .
+      dockerfile: apps/agents/deploy-agent/Dockerfile.dev
+    container_name: hauntedai-deploy-agent
+    environment:
+      NODE_ENV: development
+      VERCEL_TOKEN: ${VERCEL_TOKEN}
+      VERCEL_PROJECT_ID: ${VERCEL_PROJECT_ID}
+      STORACHA_DID: ${STORACHA_DID}
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "3005:3005"
+    depends_on:
+      - redis
+    volumes:
+      - ./apps/agents/deploy-agent:/app/apps/agents/deploy-agent
+      - ./apps/shared:/app/apps/shared
+      - /app/node_modules
+    networks:
+      - hauntedai-network
+
+  # Frontend (Next.js)
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile.dev
+    container_name: hauntedai-web
+    environment:
+      NODE_ENV: development
+      NEXT_PUBLIC_API_URL: http://localhost:3001
+      NEXT_PUBLIC_WS_URL: ws://localhost:3001
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+    volumes:
+      - ./apps/web:/app/apps/web
+      - ./apps/shared:/app/apps/shared
+      - /app/node_modules
+      - /app/apps/web/node_modules
+      - /app/apps/web/.next
+    networks:
+      - hauntedai-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  hauntedai-network:
+    driver: bridge
