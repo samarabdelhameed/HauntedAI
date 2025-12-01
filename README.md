@@ -141,7 +141,12 @@ npm run test:coverage
 - **User CRUD**: 15 tests passing
 - **Room CRUD**: 12 tests passing
 - **Asset CRUD**: 10 tests passing
-- **Total**: 37 unit tests passing
+- **Authentication**: 7 tests passing (NEW! ✨)
+  - Web3 signature verification
+  - JWT token generation
+  - User creation/login flow
+  - Error handling
+- **Total**: 44 tests passing (37 database + 7 auth)
 
 ### Full Testing Guide
 
@@ -174,12 +179,46 @@ npm test -- --watch
 | Layer          | Technology                                           |
 | -------------- | ---------------------------------------------------- |
 | **Frontend**   | Next.js 14, TypeScript, TailwindCSS, Three.js, Wagmi |
-| **Backend**    | NestJS, Express, Socket.io, Prisma                   |
+| **Backend**    | NestJS, Express, Socket.io, Prisma, JWT, Passport   |
+| **Auth**       | Web3 (ethers.js), JWT, Passport-JWT                 |
 | **Agents**     | Node.js 20, OpenAI SDK, Stability SDK                |
 | **Storage**    | PostgreSQL, Redis, Storacha, IPFS                    |
 | **Blockchain** | Hardhat, Solidity, Ethers.js, Polygon                |
 | **DevOps**     | Docker, GitHub Actions, Prometheus, Grafana          |
 | **Testing**    | Jest, fast-check, Supertest, k6                      |
+
+## 🔐 Authentication
+
+HauntedAI uses Web3 wallet authentication with JWT tokens:
+
+### How It Works
+
+1. **Connect Wallet**: User connects MetaMask or WalletConnect
+2. **Sign Message**: User signs a message to prove wallet ownership
+3. **Verify Signature**: Backend verifies signature using ethers.js
+4. **Issue JWT**: Server issues JWT token (24h expiration)
+5. **Protected Routes**: JWT guard protects authenticated endpoints
+
+### Test Authentication
+
+```bash
+# Generate test wallet and signature
+cd apps/api
+node test-auth-manual.js
+
+# Start API server
+npm run dev
+
+# Test login endpoint
+curl -X POST http://localhost:3001/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"walletAddress":"0x...","message":"...","signature":"0x..."}'
+```
+
+### API Endpoints
+
+- `POST /api/v1/auth/login` - Web3 wallet authentication
+- Returns: `{ accessToken, user: { id, did, username, walletAddress } }`
 
 ## 🎓 Kiro Integration
 
@@ -215,27 +254,35 @@ HauntedAI showcases the full power of Kiro:
 
 ## 📊 Current Status & Metrics
 
-### ✅ Completed (Phase 1)
+### ✅ Completed (Phase 1 & 2.1-2.2)
 
-- **Project Structure**: Monorepo with TypeScript, ESLint, Prettier
-- **Docker Environment**: Full stack containerization ready
-- **Database**: Prisma schema with 5 models (User, Room, Asset, Token, Badge)
-- **CI/CD**: GitHub Actions pipeline with lint, test, build, deploy
-- **Unit Tests**: 37 tests covering database operations
-- **NestJS API**: Modular structure with 5 modules ready
-- **Documentation**: Swagger/OpenAPI integration
+- **Project Structure**: Monorepo with TypeScript, ESLint, Prettier ✅
+- **Docker Environment**: Full stack containerization ready ✅
+- **Database**: Prisma schema with 5 models (User, Room, Asset, Token, Badge) ✅
+- **CI/CD**: GitHub Actions pipeline with lint, test, build, deploy ✅
+- **Unit Tests**: 44 tests passing (37 database + 7 auth) ✅
+- **NestJS API**: Modular structure with 5 modules ready ✅
+- **Documentation**: Swagger/OpenAPI integration ✅
+- **Authentication**: Web3 wallet + JWT authentication ✅
+  - Web3 signature verification with ethers.js
+  - JWT token generation (24h expiration)
+  - User creation/login flow
+  - JWT Strategy & Guard for protected routes
+  - Manual test script for real wallet testing
 
-### 🔄 In Progress (Phase 2)
+### 🔄 In Progress (Phase 2.3+)
 
-- **API Implementation**: Endpoints defined, logic pending
-- **Authentication**: Web3 wallet integration
+- **Room Management**: Implementation pending
+- **Asset Management**: Implementation pending
+- **Token Service**: Implementation pending
 - **Property-Based Tests**: 81 properties to be implemented
 
 ### 📈 Metrics
 
-- **Test Coverage**: 37 unit tests passing ✅
-- **Code Quality**: ESLint + Prettier configured
-- **API Endpoints**: 15+ endpoints defined
+- **Test Coverage**: 44 tests passing (37 DB + 7 Auth) ✅
+- **Code Quality**: ESLint + Prettier configured ✅
+- **API Endpoints**: 15+ endpoints defined ✅
+- **Authentication**: Web3 + JWT working ✅
 - **Target Coverage**: 80%+
 - **Target Response Time**: < 5s (95th percentile)
 - **Decentralized Storage**: 100% via Storacha/IPFS
