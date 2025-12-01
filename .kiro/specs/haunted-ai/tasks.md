@@ -216,43 +216,43 @@
   - **Property 4: Story generation retry with backoff**
   - **Validates: Requirements 1.4**
 
-- [ ] 7. AssetAgent Service
-- [ ] 7.1 Create AssetAgent micro-service
+- [-] 7. AssetAgent Service
+- [x] 7.1 Create AssetAgent micro-service
   - Initialize Node.js service with Express
   - Install OpenAI SDK (for DALL-E) or Stability SDK
   - Create POST /generate endpoint
   - Implement health check endpoint
   - _Requirements: 2.1_
 
-- [ ] 7.2 Implement image generation with DALL-E 3
+- [x] 7.2 Implement image generation with DALL-E 3
   - Generate image prompt from story summary
   - Call DALL-E API with spooky style parameters
   - Download generated image
   - Optimize image size (compress if > 1MB)
   - _Requirements: 2.1_
 
-- [ ] 7.3 Write property test for asset generation trigger
+- [x] 7.3 Write property test for asset generation trigger
   - **Property 5: Story completion triggers asset generation**
   - **Validates: Requirements 2.1**
 
-- [ ] 7.4 Integrate image upload to Storacha
+- [x] 7.4 Integrate image upload to Storacha
   - Upload generated image to Storacha
   - Return CID in response
   - Save image metadata to database
   - _Requirements: 2.2_
 
-- [ ] 7.5 Write property test for image storage
+- [x] 7.5 Write property test for image storage
   - **Property 6: Image storage round-trip**
   - **Property 8: Asset-story database linkage**
   - **Validates: Requirements 2.2, 2.5**
 
-- [ ] 7.6 Add retry logic for image generation failures
+- [x] 7.6 Add retry logic for image generation failures
   - Implement exponential backoff
   - Handle API rate limits
   - Log all retry attempts
   - _Requirements: 2.4_
 
-- [ ] 7.7 Write property test for asset retry logic
+- [x] 7.7 Write property test for asset retry logic
   - **Property 4: Story generation retry with backoff** (same pattern)
   - **Validates: Requirements 2.4**
 
