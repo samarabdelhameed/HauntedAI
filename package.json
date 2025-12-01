@@ -1,0 +1,72 @@
+{
+  "name": "haunted-ai",
+  "version": "1.0.0",
+  "description": "Multi-agent AI platform with decentralized storage and blockchain integration",
+  "private": true,
+  "workspaces": [
+    "apps/web",
+    "apps/api",
+    "apps/agents/story-agent",
+    "apps/agents/asset-agent",
+    "apps/agents/code-agent",
+    "apps/agents/deploy-agent",
+    "apps/agents/orchestrator",
+    "apps/blockchain",
+    "apps/storage",
+    "apps/shared"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:api\" \"npm run dev:web\" \"npm run dev:agents\"",
+    "dev:api": "npm run dev --workspace=apps/api",
+    "dev:web": "npm run dev --workspace=apps/web",
+    "dev:agents": "npm run dev --workspace=apps/agents/orchestrator",
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspaces",
+    "test:unit": "npm run test:unit --workspaces",
+    "test:property": "npm run test:property --workspaces",
+    "test:coverage": "npm run test:coverage --workspaces",
+    "test:load": "k6 run tests/load/scenario.js",
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,json,md}\"",
+    "db:migrate": "npm run db:migrate --workspace=apps/api",
+    "db:generate": "npm run db:generate --workspace=apps/api",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "concurrently": "^8.2.2",
+    "eslint": "^8.54.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-import": "^2.29.0",
+    "prettier": "^3.1.0",
+    "typescript": "^5.3.2"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/haunted-ai.git"
+  },
+  "keywords": [
+    "ai",
+    "multi-agent",
+    "blockchain",
+    "ipfs",
+    "storacha",
+    "polygon",
+    "web3",
+    "nextjs",
+    "nestjs",
+    "kiro"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}
