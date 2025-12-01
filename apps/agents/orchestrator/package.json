@@ -1,0 +1,30 @@
+{
+  "name": "@hauntedai/orchestrator",
+  "version": "1.0.0",
+  "description": "Orchestrator service for HauntedAI agent workflow coordination",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "keywords": [
+    "orchestrator",
+    "workflow",
+    "agents"
+  ],
+  "author": "HauntedAI Team",
+  "license": "MIT",
+  "dependencies": {
+    "ioredis": "^5.3.2",
+    "socket.io": "^4.6.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/socket.io-client": "^1.4.36",
+    "socket.io-client": "^4.8.1",
+    "typescript": "^5.0.0"
+  }
+}

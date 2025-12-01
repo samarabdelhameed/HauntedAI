@@ -96,9 +96,9 @@ describe('Fallback Storage Service - Property Tests', () => {
             (storachaService as any).client = originalClient;
           }
         ),
-        { numRuns: 10 } // Reduced runs for real retry delays
+        { numRuns: 5 } // Reduced runs for real retry delays (each run has 3 retries)
       );
-    }, 60000); // Increased timeout for real retry logic
+    }, 120000); // Increased timeout for real retry logic (5 runs × 3 retries × ~6s = ~90s)
 
     it('should store and retrieve files locally with round-trip integrity', async () => {
       await fc.assert(

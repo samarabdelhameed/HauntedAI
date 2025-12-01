@@ -142,36 +142,36 @@
   - **Property 47: Storacha fallback storage**
   - **Validates: Requirements 12.4**
 
-- [ ] 5. Orchestrator Service
-- [ ] 5.1 Create orchestrator core logic
+- [x] 5. Orchestrator Service
+- [x] 5.1 Create orchestrator core logic
   - Implement workflow state management
   - Create agent trigger map (user.input → StoryAgent → AssetAgent → CodeAgent → DeployAgent)
   - Add retry logic with exponential backoff (2s, 4s, 8s)
   - Implement error recovery and workflow continuation
   - _Requirements: 12.1, 12.2_
 
-- [ ] 5.2 Write property test for orchestrator retry logic
+- [x] 5.2 Write property test for orchestrator retry logic
   - **Property 44: Agent retry with exponential backoff**
   - **Property 45: Workflow continuation after agent failure**
   - **Validates: Requirements 12.1, 12.2**
 
-- [ ] 5.3 Implement log emission via Redis pub/sub
+- [x] 5.3 Implement log emission via Redis pub/sub
   - Create log emitter that publishes to Redis channel
   - Add timestamp and agent type to all log messages
   - Implement log levels (info, warn, error, success)
   - _Requirements: 5.1, 5.2_
 
-- [ ] 5.4 Add WebSocket notification service
+- [x] 5.4 Add WebSocket notification service
   - Implement Socket.io server for real-time notifications
   - Send deployment completion notifications
   - Add connection authentication
   - _Requirements: 4.3_
 
-- [ ] 5.5 Write property test for WebSocket notifications
+- [x] 5.5 Write property test for WebSocket notifications
   - **Property 14: Deployment WebSocket notification**
   - **Validates: Requirements 4.3**
 
-- [ ] 5.6 Implement agent execution with timeout
+- [x] 5.6 Implement agent execution with timeout
   - Add timeout configuration for each agent (30s for Story, 60s for Asset/Code, 120s for Deploy)
   - Kill agent process if timeout exceeded
   - Log timeout errors
