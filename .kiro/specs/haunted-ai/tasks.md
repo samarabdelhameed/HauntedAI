@@ -56,14 +56,14 @@
   - **Property 41: JWT storage and usage**
   - **Validates: Requirements 11.1, 11.2, 11.3**
 
-- [ ] 2.4 Implement room management endpoints
+- [x] 2.4 Implement room management endpoints
   - POST /api/v1/rooms - Create new room
   - POST /api/v1/rooms/:id/start - Start agent workflow
   - GET /api/v1/rooms/:id - Get room details
   - GET /api/v1/rooms - List user's rooms
   - _Requirements: 8.1, 8.2, 8.3_
 
-- [ ] 2.5 Write property test for room management
+- [x] 2.5 Write property test for room management
   - **Property 27: Room creation uniqueness**
   - **Property 28: New room initial state**
   - **Property 29: Room status transitions**
