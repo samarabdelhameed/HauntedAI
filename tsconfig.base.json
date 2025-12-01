@@ -17,14 +17,8 @@
     "rootDir": "./src",
     "baseUrl": ".",
     "paths": {
-      "@haunted-ai/shared/*": ["apps/shared/src/*"]
-    },
-    "types": ["node"],
-    "incremental": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true
+      "@haunted-ai/shared": ["apps/shared/src"]
+    }
   },
   "exclude": ["node_modules", "dist", "build", ".next"]
 }
