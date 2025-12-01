@@ -3,10 +3,12 @@ import { Module } from '@nestjs/common';
 
 import { RoomsController } from './rooms.controller';
 import { RoomsService } from './rooms.service';
+import { RedisService } from './redis.service';
+import { SSEService } from './sse.service';
 
 @Module({
   controllers: [RoomsController],
-  providers: [RoomsService],
-  exports: [RoomsService],
+  providers: [RoomsService, RedisService, SSEService],
+  exports: [RoomsService, RedisService, SSEService],
 })
 export class RoomsModule {}

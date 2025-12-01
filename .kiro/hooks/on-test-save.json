@@ -1,0 +1,16 @@
+{
+  "name": "Run Tests on Save",
+  "description": "Automatically run property-based tests when test files are saved",
+  "trigger": {
+    "type": "onSave",
+    "filePattern": "**/*.property.test.ts"
+  },
+  "action": {
+    "type": "command",
+    "command": "cd apps/api && npm test -- ${file} --runInBand --no-coverage",
+    "showOutput": true,
+    "notifyOnSuccess": true,
+    "notifyOnError": true
+  },
+  "enabled": true
+}

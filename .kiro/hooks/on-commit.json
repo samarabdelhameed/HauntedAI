@@ -1,0 +1,14 @@
+{
+  "name": "Pre-commit Quality Check",
+  "description": "Run linter and tests before committing code",
+  "trigger": {
+    "type": "preCommit"
+  },
+  "action": {
+    "type": "command",
+    "command": "npm run lint && cd apps/api && npm test -- --runInBand --no-coverage",
+    "showOutput": true,
+    "blockOnError": true
+  },
+  "enabled": true
+}

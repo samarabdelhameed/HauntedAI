@@ -1,325 +1,422 @@
 # Contributing to HauntedAI
 
-Thank you for your interest in contributing to HauntedAI! 👻
+Thank you for your interest in contributing to HauntedAI! This document provides guidelines and instructions for contributing.
 
-## Development Setup
+## 🎯 Development Philosophy
+
+HauntedAI follows **Spec-Driven Development** with **Property-Based Testing**:
+
+1. **Requirements First**: Define what the system should do (EARS format)
+2. **Properties Second**: Define correctness properties
+3. **Tests Third**: Write property-based tests
+4. **Code Last**: Implement to make tests pass
+
+## 🚀 Getting Started
 
 ### Prerequisites
 
 - Node.js 20+
 - Docker & Docker Compose
 - Git
+- Kiro IDE (recommended)
 
-### Getting Started
-
-1. **Fork and clone the repository**
-
-```bash
-git clone https://github.com/samarabdelhameed/HauntedAI.git
-cd HauntedAI
-```
-
-2. **Install dependencies**
+### Setup
 
 ```bash
+# Fork and clone
+git clone https://github.com/yourusername/haunted-ai.git
+cd haunted-ai
+
+# Install dependencies
 npm install
-```
 
-3. **Set up environment variables**
-
-```bash
-cp .env.example .env
-# Edit .env with your API keys
-```
-
-4. **Start development environment**
-
-```bash
+# Start services
 docker-compose -f docker-compose.dev.yml up -d
-```
 
-5. **Run database migrations**
-
-```bash
+# Run migrations
+cd apps/api
 npm run db:migrate
-```
 
-6. **Start development servers**
-
-```bash
-npm run dev
-```
-
-## Project Structure
-
-```
-HauntedAI/
-├── apps/
-│   ├── api/              # NestJS API Gateway
-│   ├── web/              # Next.js Frontend
-│   ├── agents/           # AI Agent Services
-│   │   ├── story-agent/
-│   │   ├── asset-agent/
-│   │   ├── code-agent/
-│   │   ├── deploy-agent/
-│   │   └── orchestrator/
-│   ├── blockchain/       # Smart Contracts
-│   ├── storage/          # Storacha Integration
-│   └── shared/           # Shared Types
-├── .kiro/                # Kiro Specs & Config
-└── docker-compose.dev.yml
-```
-
-## Coding Standards
-
-### TypeScript
-
-- Use TypeScript for all code
-- Enable strict mode
-- Avoid `any` types
-- Use interfaces for data structures
-
-### Code Style
-
-- Follow ESLint rules
-- Use Prettier for formatting
-- Run `npm run lint:fix` before committing
-- Run `npm run format` to format code
-
-### Naming Conventions
-
-- **Files**: kebab-case (e.g., `user-service.ts`)
-- **Classes**: PascalCase (e.g., `UserService`)
-- **Functions**: camelCase (e.g., `getUserById`)
-- **Constants**: UPPER_SNAKE_CASE (e.g., `MAX_RETRIES`)
-
-### Git Commit Messages
-
-Follow conventional commits:
-
-```
-feat: Add new feature
-fix: Fix bug
-docs: Update documentation
-style: Format code
-refactor: Refactor code
-test: Add tests
-chore: Update dependencies
-```
-
-## Testing
-
-### Running Tests
-
-```bash
-# All tests
+# Run tests
 npm test
-
-# Unit tests only
-npm run test:unit
-
-# Property-based tests
-npm run test:property
-
-# With coverage
-npm run test:coverage
 ```
 
-### Writing Tests
+## 📝 Contribution Workflow
 
-#### Unit Tests
+### 1. Create an Issue
+
+Before starting work, create an issue describing:
+- What you want to add/fix
+- Why it's needed
+- How you plan to implement it
+
+### 2. Create a Branch
+
+```bash
+git checkout -b feature/your-feature-name
+# or
+git checkout -b fix/your-bug-fix
+```
+
+### 3. Follow Spec-Driven Development
+
+#### Step 1: Update Requirements
+
+Edit `.kiro/specs/haunted-ai/requirements.md`:
+
+```markdown
+### Requirement X: Your Feature
+
+**User Story:** As a [role], I want [feature], so that [benefit]
+
+#### Acceptance Criteria
+
+1. WHEN [trigger] THEN THE System SHALL [response]
+2. WHEN [trigger] THEN THE System SHALL [response]
+```
+
+#### Step 2: Define Properties
+
+Edit `.kiro/specs/haunted-ai/design.md`:
+
+```markdown
+**Property X: Your property name**
+_For any_ [input], the system should [behavior].
+**Validates: Requirements X.Y**
+```
+
+#### Step 3: Add Tasks
+
+Edit `.kiro/specs/haunted-ai/tasks.md`:
+
+```markdown
+- [ ] X.Y Implement your feature
+  - **Property X: Your property name**
+  - **Validates: Requirements X.Y**
+```
+
+#### Step 4: Write Property Tests
+
+Create `your-feature.property.test.ts`:
 
 ```typescript
-describe('UserService', () => {
-  it('should create a new user', async () => {
-    const user = await userService.create({ username: 'test' });
-    expect(user.username).toBe('test');
+// Feature: haunted-ai, Property X: Your property name
+// Validates: Requirements X.Y
+describe('Property X: Your property name', () => {
+  it('should [behavior] for any [input]', async () => {
+    await fc.assert(
+      fc.asyncProperty(
+        fc.record({
+          // Your generators
+        }),
+        async (input) => {
+          jest.clearAllMocks();
+          
+          // Your test logic
+          
+          expect(/* ... */).toBe(/* ... */);
+        }
+      ),
+      { numRuns: 100 }
+    );
   });
 });
 ```
 
-#### Property-Based Tests
+#### Step 5: Implement Code
 
+Write the minimum code needed to make tests pass.
+
+### 4. Run Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run specific test
+npm test -- your-feature.property.test.ts --runInBand
+
+# Run with coverage
+npm run test:coverage
+```
+
+### 5. Commit Changes
+
+```bash
+# Stage changes
+git add .
+
+# Commit with descriptive message
+git commit -m "feat: add your feature
+
+- Add requirements for feature X
+- Define property X in design
+- Implement property tests
+- Add implementation
+
+Validates: Requirements X.Y
+Tests: Property X (100 iterations)
+"
+```
+
+### 6. Push and Create PR
+
+```bash
+# Push to your fork
+git push origin feature/your-feature-name
+
+# Create PR on GitHub
+# Include:
+# - Description of changes
+# - Link to issue
+# - Test results
+# - Screenshots (if UI changes)
+```
+
+## 🧪 Testing Standards
+
+### Property-Based Tests
+
+**Required for:**
+- Universal properties (holds for all inputs)
+- Round-trip operations
+- Invariants
+- State transitions
+
+**Format:**
 ```typescript
-// Feature: haunted-ai, Property X: Description
-// Validates: Requirements Y.Z
-it('should maintain invariant', async () => {
-  await fc.assert(
-    fc.asyncProperty(fc.string(), async (input) => {
-      // Test logic
-    }),
-    { numRuns: 100 }
-  );
+// Feature: haunted-ai, Property X: [description]
+// Validates: Requirements X.Y
+describe('Property X: [name]', () => {
+  it('should [behavior]', async () => {
+    await fc.assert(
+      fc.asyncProperty(/* ... */),
+      { numRuns: 100 }
+    );
+  });
 });
 ```
 
-## Pull Request Process
+### Unit Tests
 
-1. **Create a feature branch**
+**Required for:**
+- Specific examples
+- Edge cases
+- Error conditions
+- Integration points
 
-```bash
-git checkout -b feature/your-feature-name
+**Format:**
+```typescript
+describe('ComponentName', () => {
+  it('should handle specific case', async () => {
+    // Arrange
+    const input = /* ... */;
+    
+    // Act
+    const result = await service.method(input);
+    
+    // Assert
+    expect(result).toBe(expected);
+  });
+});
 ```
 
-2. **Make your changes**
+### Test Requirements
 
-- Write clean, documented code
-- Add tests for new features
-- Update documentation
+- ✅ All property tests must run 100+ iterations
+- ✅ All tests must have descriptive names
+- ✅ All tests must link to requirements
+- ✅ Mocks must be properly reset
+- ✅ Coverage must be ≥ 80%
 
-3. **Test your changes**
+## 📐 Code Standards
 
-```bash
-npm run lint
-npm test
+### TypeScript
+
+```typescript
+// Use explicit types
+function processLog(log: AgentLog): void {
+  // ...
+}
+
+// Use interfaces for data structures
+interface AgentLog {
+  timestamp: Date;
+  agentType: 'story' | 'asset' | 'code' | 'deploy';
+  level: 'info' | 'warn' | 'error' | 'success';
+  message: string;
+}
+
+// Use async/await, not callbacks
+async function fetchData(): Promise<Data> {
+  const response = await api.get('/data');
+  return response.data;
+}
 ```
 
-4. **Commit your changes**
+### NestJS
 
-```bash
-git add .
-git commit -m "feat: Add your feature"
+```typescript
+// Use dependency injection
+@Injectable()
+export class MyService {
+  constructor(
+    private readonly dependency: DependencyService,
+  ) {}
+}
+
+// Use decorators for validation
+export class CreateDto {
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+}
+
+// Use proper error handling
+throw new NotFoundException('Resource not found');
 ```
 
-5. **Push to your fork**
+### Naming Conventions
 
-```bash
-git push origin feature/your-feature-name
+- **Files**: `kebab-case.ts`
+- **Classes**: `PascalCase`
+- **Functions**: `camelCase`
+- **Constants**: `UPPER_SNAKE_CASE`
+- **Interfaces**: `PascalCase` (no `I` prefix)
+
+## 📚 Documentation
+
+### Code Comments
+
+```typescript
+/**
+ * Emit a log message to a room via Redis pub/sub
+ * 
+ * @param roomId - The room ID to emit to
+ * @param agentType - The type of agent emitting the log
+ * @param level - The log level
+ * @param message - The log message
+ * @param metadata - Optional metadata
+ * 
+ * Requirements: 5.1
+ */
+async emitLog(
+  roomId: string,
+  agentType: AgentLog['agentType'],
+  level: AgentLog['level'],
+  message: string,
+  metadata?: Record<string, any>,
+): Promise<void> {
+  // ...
+}
 ```
 
-6. **Create a Pull Request**
+### README Updates
 
-- Provide a clear description
-- Reference related issues
-- Wait for review
+If your change affects:
+- Setup process → Update README.md
+- API endpoints → Update API docs
+- Testing → Update testing guides
 
-## Code Review Guidelines
+## 🔍 Code Review Process
 
-### For Contributors
+### Before Requesting Review
 
-- Respond to feedback promptly
-- Make requested changes
-- Keep PRs focused and small
+- [ ] All tests pass
+- [ ] Coverage ≥ 80%
+- [ ] Code follows standards
+- [ ] Documentation updated
+- [ ] Commits are clean
 
-### For Reviewers
+### Review Checklist
 
-- Be respectful and constructive
-- Focus on code quality
-- Check for test coverage
-- Verify documentation
+Reviewers will check:
+- [ ] Requirements are clear
+- [ ] Properties are well-defined
+- [ ] Tests are comprehensive
+- [ ] Code is clean and maintainable
+- [ ] Documentation is complete
 
-## Development Workflow
+## 🐛 Bug Reports
 
-### Adding a New Feature
+### Template
 
-1. **Create Kiro Spec**
+```markdown
+**Description**
+Clear description of the bug
 
-```bash
-# Create spec files in .kiro/specs/feature-name/
-- requirements.md
-- design.md
-- tasks.md
+**Steps to Reproduce**
+1. Step 1
+2. Step 2
+3. Step 3
+
+**Expected Behavior**
+What should happen
+
+**Actual Behavior**
+What actually happens
+
+**Environment**
+- OS: macOS/Linux/Windows
+- Node: 20.x
+- Browser: Chrome/Firefox/Safari
+
+**Logs**
+```
+Paste relevant logs here
 ```
 
-2. **Implement Feature**
-
-- Follow the task list
-- Write tests alongside code
-- Update documentation
-
-3. **Test Thoroughly**
-
-- Unit tests
-- Property-based tests
-- Integration tests
-
-4. **Submit PR**
-
-### Fixing a Bug
-
-1. **Write a failing test**
-2. **Fix the bug**
-3. **Verify test passes**
-4. **Submit PR**
-
-## Database Migrations
-
-### Creating a Migration
-
-```bash
-npm run db:migrate --workspace=apps/api
+**Screenshots**
+If applicable
 ```
 
-### Applying Migrations
+## 💡 Feature Requests
 
-```bash
-npm run db:push --workspace=apps/api
+### Template
+
+```markdown
+**Feature Description**
+Clear description of the feature
+
+**Use Case**
+Why is this needed?
+
+**Proposed Solution**
+How should it work?
+
+**Alternatives Considered**
+Other approaches you've thought about
+
+**Additional Context**
+Any other relevant information
 ```
 
-## Docker Commands
+## 🎯 Priority Labels
 
-### Start services
+- `P0: Critical` - Blocking issues, security vulnerabilities
+- `P1: High` - Important features, major bugs
+- `P2: Medium` - Nice-to-have features, minor bugs
+- `P3: Low` - Enhancements, documentation
 
-```bash
-docker-compose -f docker-compose.dev.yml up -d
-```
+## 📞 Getting Help
 
-### Stop services
+- **GitHub Issues**: For bugs and features
+- **GitHub Discussions**: For questions and ideas
+- **Discord**: [Join our server](https://discord.gg/haunted-ai)
+- **Email**: dev@haunted-ai.com
 
-```bash
-docker-compose -f docker-compose.dev.yml down
-```
+## 🙏 Recognition
 
-### View logs
+Contributors will be:
+- Listed in CONTRIBUTORS.md
+- Mentioned in release notes
+- Credited in documentation
 
-```bash
-docker-compose -f docker-compose.dev.yml logs -f
-```
-
-### Rebuild services
-
-```bash
-docker-compose -f docker-compose.dev.yml up -d --build
-```
-
-## Troubleshooting
-
-### Port already in use
-
-```bash
-# Find process using port
-lsof -i :3001
-# Kill process
-kill -9 <PID>
-```
-
-### Database connection issues
-
-```bash
-# Reset database
-docker-compose down -v
-docker-compose up -d postgres
-npm run db:push
-```
-
-### Node modules issues
-
-```bash
-# Clean install
-rm -rf node_modules package-lock.json
-npm install
-```
-
-## Getting Help
-
-- **Discord**: [Join our community](https://discord.gg/hauntedai)
-- **GitHub Issues**: [Report bugs or request features](https://github.com/samarabdelhameed/HauntedAI/issues)
-- **Documentation**: [Read the docs](./.kiro/specs/)
-
-## License
+## 📄 License
 
 By contributing, you agree that your contributions will be licensed under the MIT License.
 
 ---
 
-**Thank you for contributing to HauntedAI! 👻**
+**Thank you for contributing to HauntedAI!** 🎃👻
+

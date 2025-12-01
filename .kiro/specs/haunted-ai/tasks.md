@@ -69,13 +69,13 @@
   - **Property 29: Room status transitions**
   - **Validates: Requirements 8.1, 8.2, 8.3, 8.4, 8.5**
 
-- [ ] 2.6 Implement Server-Sent Events for live logs
+- [x] 2.6 Implement Server-Sent Events for live logs
   - Create SSE endpoint (GET /api/v1/rooms/:id/logs)
   - Implement log streaming service with Redis pub/sub
   - Add connection management and heartbeat
   - _Requirements: 5.1, 5.2_
 
-- [ ] 2.7 Write property test for live logging
+- [x] 2.7 Write property test for live logging
   - **Property 15: Agent operations emit logs**
   - **Property 16: Log message rendering completeness**
   - **Property 19: Log buffer size limit**

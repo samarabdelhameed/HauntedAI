@@ -9,6 +9,7 @@ import {
   Request,
   HttpCode,
   HttpStatus,
+  Res,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -17,10 +18,12 @@ import {
   ApiBearerAuth,
   ApiParam,
 } from '@nestjs/swagger';
+import { Response } from 'express';
 
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 import { RoomsService } from './rooms.service';
+import { SSEService } from './sse.service';
 import { CreateRoomDto } from './dto/create-room.dto';
 
 @ApiTags('rooms')
@@ -28,7 +31,10 @@ import { CreateRoomDto } from './dto/create-room.dto';
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class RoomsController {
-  constructor(private readonly roomsService: RoomsService) {}
+  constructor(
+    private readonly roomsService: RoomsService,
+    private readonly sseService: SSEService,
+  ) {}
 
   @Post()
   @ApiOperation({ summary: 'Create new room' })
@@ -135,5 +141,30 @@ export class RoomsController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async start(@Param('id') id: string) {
     return this.roomsService.startWorkflow(id);
+  }
+
+  @Get(':id/logs')
+  @ApiOperation({ summary: 'Stream live logs for room via Server-Sent Events' })
+  @ApiParam({ name: 'id', description: 'Room UUID' })
+  @ApiResponse({
+    status: 200,
+    description: 'SSE stream of room logs',
+    content: {
+      'text/event-stream': {
+        schema: {
+          type: 'string',
+          example: 'event: log\ndata: {"timestamp":"2024-01-01T00:00:00.000Z","agentType":"story","level":"info","message":"Starting story generation"}\n\n',
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 404, description: 'Room not found' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async streamLogs(@Param('id') id: string, @Res() res: Response) {
+    // Verify room exists
+    await this.roomsService.findOne(id);
+
+    // Create SSE connection
+    await this.sseService.createConnection(id, res);
   }
 }
