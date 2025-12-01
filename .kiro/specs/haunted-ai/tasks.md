@@ -81,7 +81,7 @@
   - **Property 19: Log buffer size limit**
   - **Validates: Requirements 5.1, 5.2, 5.5**
 
-- [ ] 2.8 Implement asset endpoints
+- [x] 2.8 Implement asset endpoints
   - GET /api/v1/assets - List assets with filtering
   - GET /api/v1/assets/:id - Get asset details
   - GET /api/v1/explore - Public content discovery with pagination
@@ -92,7 +92,7 @@
   - **Property 36: Content modal completeness**
   - **Validates: Requirements 10.2, 10.3**
 
-- [ ] 2.10 Implement token endpoints
+- [x] 2.10 Implement token endpoints
   - GET /api/v1/users/:did/balance - Get user token balance
   - GET /api/v1/users/:did/transactions - Get transaction history
   - POST /api/v1/tokens/reward - Internal endpoint for rewarding users
