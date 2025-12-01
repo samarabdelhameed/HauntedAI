@@ -107,38 +107,38 @@
 - [x] 3. Checkpoint - Ensure API Gateway tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 4. Storacha Integration Service
-- [ ] 4.1 Create Storacha client wrapper
+- [x] 4. Storacha Integration Service
+- [x] 4.1 Create Storacha client wrapper
   - Install @web3-storage/w3up-client
   - Implement DID-based authentication
   - Create uploadFile and retrieveFile methods
   - Add retry logic with exponential backoff
   - _Requirements: 7.1, 7.2, 7.4_
 
-- [ ] 4.2 Write property test for Storacha operations
+- [x] 4.2 Write property test for Storacha operations
   - **Property 2: Story storage round-trip**
   - **Property 6: Image storage round-trip**
   - **Property 23: Upload performance and CID validity**
   - **Property 25: Content retrieval round-trip**
   - **Validates: Requirements 1.2, 2.2, 7.2, 7.4**
 
-- [ ] 4.3 Implement CID metadata storage
+- [x] 4.3 Implement CID metadata storage
   - Create service to save CID metadata to database
   - Add file type, size, and timestamp tracking
   - Implement CID validation (regex pattern matching)
   - _Requirements: 7.3_
 
-- [ ] 4.4 Write property test for CID metadata
+- [x] 4.4 Write property test for CID metadata
   - **Property 24: CID metadata persistence**
   - **Validates: Requirements 7.3**
 
-- [ ] 4.5 Add fallback storage for Storacha failures
+- [x] 4.5 Add fallback storage for Storacha failures
   - Implement local filesystem storage as fallback
   - Create retry queue for failed uploads
   - Add background job to retry failed uploads
   - _Requirements: 12.4_
 
-- [ ] 4.6 Write property test for fallback storage
+- [x] 4.6 Write property test for fallback storage
   - **Property 47: Storacha fallback storage**
   - **Validates: Requirements 12.4**
 

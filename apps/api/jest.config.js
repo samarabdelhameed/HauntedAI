@@ -4,8 +4,16 @@ module.exports = {
   roots: ['<rootDir>/src'],
   testMatch: ['**/__tests__/**/*.ts', '**/?(*.)+(spec|test).ts'],
   transform: {
-    '^.+\\.ts$': 'ts-jest',
+    '^.+\\.ts$': ['ts-jest', {
+      tsconfig: {
+        esModuleInterop: true,
+        allowSyntheticDefaultImports: true,
+      },
+    }],
   },
+  transformIgnorePatterns: [
+    'node_modules/(?!(@web3-storage|@ucanto|multiformats|@ipld)/)',
+  ],
   collectCoverageFrom: [
     'src/**/*.ts',
     '!src/**/*.d.ts',

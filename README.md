@@ -249,10 +249,10 @@ it('should emit log within 100ms for any agent operation', async () => {
 ### Latest Test Results (December 2024)
 
 ```bash
-Test Suites: 5 passed, 5 total
-Tests:       44 passed, 44 total
+Test Suites: 8 passed, 8 total
+Tests:       67 passed, 67 total
 Snapshots:   0 total
-Time:        6.409 s
+Time:        22.273 s
 ```
 
 **Property Test Suites:**
@@ -261,6 +261,9 @@ Time:        6.409 s
 - ✅ `tokens.property.test.ts` - Token Rewards Properties (8 tests)
 - ✅ `rooms.property.test.ts` - Room Management Properties (9 tests)
 - ✅ `live-logging.property.test.ts` - Live Logging Properties (9 tests)
+- ✅ `storacha.property.test.ts` - Storacha Integration Properties (8 tests)
+- ✅ `metadata.property.test.ts` - CID Metadata Properties (5 tests)
+- ✅ `fallback-storage.property.test.ts` - Fallback Storage Properties (10 tests)
 
 **Each property test runs 100 iterations with random inputs to verify correctness across all possible scenarios.**
 
@@ -426,6 +429,90 @@ Seamless integration with external services:
 - View (Story/Image/Code): **1 HHCW token**
 - Referral: **50 HHCW tokens**
 
+### Property 2: Story Storage Round-Trip
+
+**Property**: _For any_ story content, uploading to Storacha and then retrieving should return identical content.
+
+**Validates**: Requirements 1.2
+
+```typescript
+✓ should retrieve identical story after storage (25 ms)
+```
+
+**Test Results**: 100 iterations with random story content (10-1000 chars), all passing ✅
+
+### Property 6: Image Storage Round-Trip
+
+**Property**: _For any_ image binary data, uploading to Storacha and then retrieving should return byte-identical content.
+
+**Validates**: Requirements 2.2
+
+```typescript
+✓ should retrieve identical image data after storage (30 ms)
+```
+
+**Test Results**: 100 iterations with random binary data (100-10000 bytes), all passing ✅
+
+### Property 23: Upload Performance and CID Validity
+
+**Property**: _For any_ content upload, the operation should complete within 10 seconds and return a valid CID v1 format.
+
+**Validates**: Requirements 7.2
+
+```typescript
+✓ should complete upload within 10 seconds and return valid CID (11 ms)
+```
+
+**Test Results**: 100 iterations with random content, all completing < 10s ✅
+
+### Property 24: CID Metadata Persistence
+
+**Property**: _For any_ CID saved to database, all metadata fields (file type, size, timestamp) should be persisted and retrievable.
+
+**Validates**: Requirements 7.3
+
+```typescript
+✓ should persist complete CID metadata to database (39 ms)
+✓ should retrieve CID metadata with all fields intact (17 ms)
+```
+
+**Test Results**: 100 iterations with random metadata, all passing ✅
+
+### Property 25: Content Retrieval Round-Trip
+
+**Property**: _For any_ content uploaded with a filename, retrieving by CID should return the exact original content.
+
+**Validates**: Requirements 7.4
+
+```typescript
+✓ should retrieve original content using CID (10 ms)
+```
+
+**Test Results**: 100 iterations with random content and filenames, all passing ✅
+
+### Property 47: Storacha Fallback Storage
+
+**Property**: _For any_ content upload when Storacha is unavailable, the system should store content locally and return a fallback identifier.
+
+**Validates**: Requirements 12.4
+
+```typescript
+✓ should store content locally when Storacha upload fails (130 ms)
+✓ should store and retrieve files locally with round-trip integrity (152 ms)
+```
+
+**Test Results**: 100 iterations with simulated Storacha failures, all passing ✅
+
+**Storacha Integration Features:**
+- ✅ DID-based authentication
+- ✅ File upload with CID generation (CID v1 format)
+- ✅ File retrieval from IPFS gateways
+- ✅ Retry logic with exponential backoff (3 attempts, 2s → 4s → 8s)
+- ✅ CID metadata storage in PostgreSQL
+- ✅ Local fallback storage when Storacha unavailable
+- ✅ Retry queue for failed uploads
+- ✅ Round-trip integrity verification
+
 ## 🔧 Technology Stack
 
 | Layer | Technology | Purpose |
@@ -579,8 +666,28 @@ MIT License - see [LICENSE](LICENSE) for details
 - ✅ **Hooks**: Automated testing on file save
 - ✅ **Steering**: Project standards enforced
 - ✅ **MCP**: Integration with OpenAI, Storacha, Redis, PostgreSQL
-- ✅ **Testing**: Property-based testing with 100+ iterations
+- ✅ **Testing**: Property-based testing with 100+ iterations per property
 - ✅ **Documentation**: Comprehensive and auto-generated
+
+### Recent Updates (December 2024)
+
+**✅ Task 4 Complete: Storacha Integration Service**
+
+Implemented full decentralized storage integration with comprehensive property-based testing:
+
+- **Storacha Client Wrapper**: DID-based authentication, file upload/retrieval
+- **CID Metadata Service**: Database persistence with validation
+- **Fallback Storage**: Local storage when Storacha unavailable
+- **Retry Queue**: Background worker for failed uploads
+- **Property Tests**: 23 tests covering all integration scenarios
+  - Round-trip integrity (stories, images, binary data)
+  - Upload performance (< 10s requirement)
+  - CID validation (v1 format)
+  - Metadata persistence
+  - Fallback behavior
+  - Retry logic with exponential backoff
+
+**Test Results**: All 23 property tests passing with 100 iterations each ✅
 
 ---
 
