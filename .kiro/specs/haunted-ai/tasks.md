@@ -104,7 +104,7 @@
   - **Property 34: Balance calculation correctness**
   - **Validates: Requirements 9.1, 9.2, 9.5**
 
-- [ ] 3. Checkpoint - Ensure API Gateway tests pass
+- [x] 3. Checkpoint - Ensure API Gateway tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 4. Storacha Integration Service
