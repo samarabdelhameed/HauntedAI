@@ -50,7 +50,7 @@
   - Add JWT storage in response headers
   - _Requirements: 11.1, 11.2, 11.3_
 
-- [ ] 2.3 Write property test for authentication
+- [x] 2.3 Write property test for authentication
   - **Property 39: Wallet connection triggers signature request**
   - **Property 40: Valid signature issues JWT**
   - **Property 41: JWT storage and usage**
