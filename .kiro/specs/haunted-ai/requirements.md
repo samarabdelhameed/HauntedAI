@@ -285,6 +285,7 @@ HauntedAI is a multi-agent AI system that autonomously generates spooky content 
 **Goal**: Demonstrate autonomous agent workflow with Kiro integration
 
 **Core Requirements**:
+
 1. ✅ **Requirement 1**: Story Generation (StoryAgent with OpenAI)
 2. ✅ **Requirement 2**: Asset Generation (AssetAgent with DALL-E)
 3. ✅ **Requirement 3**: Code Generation (CodeAgent with Codex)
@@ -303,6 +304,7 @@ HauntedAI is a multi-agent AI system that autonomously generates spooky content 
 **Goal**: Add professional UI, error handling, and deployment
 
 **Additional Requirements**:
+
 - **Requirement 6**: Spooky UI (Dark theme, fog, sounds)
 - **Requirement 8**: Room Management (Session tracking)
 - **Requirement 12**: Error Recovery (Retry logic, resilience)
@@ -320,6 +322,7 @@ HauntedAI is a multi-agent AI system that autonomously generates spooky content 
 **Goal**: Add Web3 features and token economy
 
 **Additional Requirements**:
+
 - **Requirement 11**: Web3 Authentication (Wallet connect)
 - **Requirement 9**: Token Rewards (HHCW ERC20)
 - **Requirement 16**: NFT Badges (Ghost Badge ERC721)
@@ -335,6 +338,7 @@ HauntedAI is a multi-agent AI system that autonomously generates spooky content 
 **Goal**: Complete all advanced features
 
 **Additional Requirements**:
+
 - **Requirement 4**: Deployment Automation (DeployAgent)
 - **Requirement 10**: Explore & Discovery (Content browsing)
 - **Requirement 13**: Three.js Visualization (3D effects)
@@ -352,6 +356,7 @@ HauntedAI is a multi-agent AI system that autonomously generates spooky content 
 ## 📝 Notes for Judges
 
 This project demonstrates **Kiro's full capabilities**:
+
 - ✅ **Specs-driven development**: Every agent defined in Kiro specs
 - ✅ **MCP Plugins**: Real integration with OpenAI and Storacha
 - ✅ **Steering Docs**: Project standards enforced via Kiro

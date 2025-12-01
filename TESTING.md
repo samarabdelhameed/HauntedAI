@@ -5,12 +5,14 @@
 ### Completed Tests (Phase 1)
 
 #### 1. Project Structure ✅
+
 - [x] Monorepo setup with workspaces
 - [x] TypeScript configuration
 - [x] ESLint and Prettier
 - [x] Shared types package
 
 #### 2. Docker Environment ✅
+
 - [x] docker-compose.dev.yml created
 - [x] PostgreSQL service configured
 - [x] Redis service configured
@@ -18,18 +20,21 @@
 - [x] Dockerfiles for each service
 
 #### 3. Database Setup ✅
+
 - [x] Prisma schema created
 - [x] User, Room, Asset, TokenTransaction, Badge models
 - [x] Database indexes configured
 - [x] Prisma Client generation working
 
 #### 4. CI/CD Pipeline ✅
+
 - [x] GitHub Actions workflow
 - [x] Lint, test, build stages
 - [x] Docker image building
 - [x] Staging deployment automation
 
 #### 5. Unit Tests ✅
+
 - [x] User CRUD operations (15 tests)
 - [x] Room CRUD operations (12 tests)
 - [x] Asset CRUD operations (10 tests)
@@ -37,6 +42,7 @@
 - [x] Database cleanup functions
 
 #### 6. NestJS Application ✅
+
 - [x] AppModule with all modules
 - [x] Prisma module and service
 - [x] Auth module (skeleton)
@@ -50,6 +56,7 @@
 ## 🧪 How to Test
 
 ### Prerequisites
+
 ```bash
 # Install dependencies
 npm install
@@ -59,6 +66,7 @@ docker-compose -f docker-compose.dev.yml up -d postgres redis
 ```
 
 ### Database Tests
+
 ```bash
 # Generate Prisma Client
 cd apps/api
@@ -75,6 +83,7 @@ npm run test:coverage
 ```
 
 ### API Tests
+
 ```bash
 # Start API server
 cd apps/api
@@ -90,13 +99,15 @@ open http://localhost:3001/api/docs
 ## 📊 Test Coverage
 
 ### Database Operations
+
 - **User Tests**: 15 tests covering create, read, update, delete, constraints
 - **Room Tests**: 12 tests covering CRUD, status transitions, filtering
 - **Asset Tests**: 10 tests covering CRUD, cascade deletes, CID validation
 
 ### API Endpoints (Skeleton - Ready for Implementation)
+
 - **Auth**: `/api/v1/auth/login` - Web3 authentication
-- **Rooms**: 
+- **Rooms**:
   - `POST /api/v1/rooms` - Create room
   - `GET /api/v1/rooms/:id` - Get room
   - `POST /api/v1/rooms/:id/start` - Start workflow
@@ -113,6 +124,7 @@ open http://localhost:3001/api/docs
 ## 🔍 Manual Testing Checklist
 
 ### ✅ Phase 1 - Infrastructure (COMPLETED)
+
 - [x] Project builds without errors
 - [x] TypeScript compilation works
 - [x] ESLint passes
@@ -125,6 +137,7 @@ open http://localhost:3001/api/docs
 - [x] Swagger documentation is accessible
 
 ### 🔄 Phase 2 - API Implementation (IN PROGRESS)
+
 - [ ] Database migrations run successfully
 - [ ] API server starts without errors
 - [ ] Health endpoint returns correct data
@@ -136,6 +149,7 @@ open http://localhost:3001/api/docs
 - [ ] User balance calculations work
 
 ### ⏳ Phase 3 - Agent Services (PENDING)
+
 - [ ] StoryAgent generates stories
 - [ ] AssetAgent generates images
 - [ ] CodeAgent generates code
@@ -145,6 +159,7 @@ open http://localhost:3001/api/docs
 - [ ] All CIDs are valid and retrievable
 
 ### ⏳ Phase 4 - Integration (PENDING)
+
 - [ ] End-to-end workflow completes
 - [ ] Real-time logs work via SSE
 - [ ] WebSocket notifications work
@@ -155,12 +170,14 @@ open http://localhost:3001/api/docs
 ## 🐛 Known Issues
 
 ### Current Limitations
+
 1. **Database Required**: Tests require PostgreSQL running
 2. **Docker Dependency**: Full stack requires Docker
 3. **API Keys Needed**: Real functionality needs OpenAI, Storacha keys
 4. **Skeleton Endpoints**: Most endpoints return placeholder responses
 
 ### Solutions
+
 1. Use `docker-compose up -d postgres redis` before testing
 2. Copy `.env.example` to `.env` and add real API keys
 3. Implement actual logic in service files (next phase)
@@ -168,12 +185,14 @@ open http://localhost:3001/api/docs
 ## 📈 Next Steps
 
 ### Immediate (Task 2.2)
+
 1. Implement Web3 authentication service
 2. Add JWT token generation
 3. Create authentication guard
 4. Write property-based tests for auth
 
 ### Short-term (Tasks 2.3-2.11)
+
 1. Implement room management logic
 2. Implement asset management logic
 3. Implement token reward logic
@@ -181,6 +200,7 @@ open http://localhost:3001/api/docs
 5. Write property-based tests for all modules
 
 ### Medium-term (Tasks 3-10)
+
 1. Implement Storacha integration
 2. Create orchestrator service
 3. Build all agent services
@@ -190,6 +210,7 @@ open http://localhost:3001/api/docs
 ## 🎯 Success Criteria
 
 ### Phase 1 (ACHIEVED ✅)
+
 - [x] Project structure is complete
 - [x] All configuration files work
 - [x] Database schema is defined
@@ -198,6 +219,7 @@ open http://localhost:3001/api/docs
 - [x] CI/CD pipeline is configured
 
 ### Phase 2 (TARGET)
+
 - [ ] All API endpoints implemented
 - [ ] Authentication works
 - [ ] Database operations work
@@ -205,6 +227,7 @@ open http://localhost:3001/api/docs
 - [ ] Swagger docs are complete
 
 ### Phase 3 (TARGET)
+
 - [ ] All agents generate content
 - [ ] Storacha stores content
 - [ ] Orchestrator coordinates workflow
@@ -213,6 +236,7 @@ open http://localhost:3001/api/docs
 ## 📝 Test Results
 
 ### Latest Test Run
+
 ```
 Date: [To be updated after running tests]
 Environment: Development
@@ -227,6 +251,7 @@ Results:
 ```
 
 ## 🔗 Related Documentation
+
 - [README.md](./README.md) - Project overview
 - [CONTRIBUTING.md](./CONTRIBUTING.md) - Development guide
 - [Requirements](./.kiro/specs/haunted-ai/requirements.md) - Feature requirements

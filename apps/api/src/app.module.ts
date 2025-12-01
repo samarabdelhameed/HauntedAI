@@ -10,14 +10,7 @@ import { UsersModule } from './modules/users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
-  imports: [
-    PrismaModule,
-    AuthModule,
-    RoomsModule,
-    AssetsModule,
-    TokensModule,
-    UsersModule,
-  ],
+  imports: [PrismaModule, AuthModule, RoomsModule, AssetsModule, TokensModule, UsersModule],
   controllers: [HealthController],
 })
 export class AppModule {}

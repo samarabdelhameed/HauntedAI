@@ -11,6 +11,7 @@
 ## 🎯 Overview
 
 HauntedAI is a groundbreaking platform that combines:
+
 - **🤖 Autonomous AI Agents** - Four specialized agents (Story, Asset, Code, Deploy) working independently
 - **🌐 Decentralized Storage** - All content stored permanently on Storacha/IPFS
 - **⛓️ Blockchain Integration** - HHCW token rewards and Ghost Badge NFTs on Polygon
@@ -20,23 +21,27 @@ HauntedAI is a groundbreaking platform that combines:
 ## ✨ Features
 
 ### 🎭 Multi-Agent System
+
 - **StoryAgent**: Generates personalized spooky stories using GPT-4
 - **AssetAgent**: Creates haunting images with DALL-E 3
 - **CodeAgent**: Builds mini-games with auto-patching capabilities
 - **DeployAgent**: Automatically deploys content to Vercel/IPFS
 
 ### 🌟 User Experience
+
 - **Live Room**: Watch agents work in real-time with 3D visualizations
 - **Spooky Theme**: Dark mode with purple/red accents, fog effects, and ghost sprites
 - **Sound Effects**: Immersive audio with whispers, ghost laughs, and thunder
 - **Multi-language**: Full support for English and Arabic (RTL)
 
 ### 💰 Token Economy
+
 - **HHCW Token (ERC20)**: Earn rewards for uploads, views, and referrals
 - **Ghost Badges (ERC721)**: Unlock NFT achievements for milestones
 - **Treasury Contract**: Automated reward distribution
 
 ### 🔒 Decentralized & Secure
+
 - **Storacha/IPFS**: Permanent, censorship-resistant content storage
 - **Web3 Auth**: Connect with MetaMask or WalletConnect
 - **Smart Contracts**: Audited contracts on Polygon
@@ -70,6 +75,7 @@ HauntedAI is a groundbreaking platform that combines:
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Node.js 20+
 - Docker & Docker Compose
 - PostgreSQL 16
@@ -103,6 +109,7 @@ npm run dev
 ```
 
 ### Access Points
+
 - **Frontend**: http://localhost:3000
 - **API Gateway**: http://localhost:3001
 - **API Docs**: http://localhost:3001/api/docs
@@ -120,6 +127,7 @@ npm run dev
 ## 🧪 Testing
 
 ### Quick Test
+
 ```bash
 # Run all unit tests
 npm test
@@ -129,13 +137,16 @@ npm run test:coverage
 ```
 
 ### Current Test Results ✅
+
 - **User CRUD**: 15 tests passing
-- **Room CRUD**: 12 tests passing  
+- **Room CRUD**: 12 tests passing
 - **Asset CRUD**: 10 tests passing
 - **Total**: 37 unit tests passing
 
 ### Full Testing Guide
+
 See [TESTING.md](./TESTING.md) for comprehensive testing documentation including:
+
 - Manual testing checklist
 - API endpoint testing
 - Database testing
@@ -143,6 +154,7 @@ See [TESTING.md](./TESTING.md) for comprehensive testing documentation including
 - Property-based testing (81 properties planned)
 
 ### Test Commands
+
 ```bash
 # Unit tests only
 npm run test:unit
@@ -159,29 +171,32 @@ npm test -- --watch
 
 ## 🛠️ Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| **Frontend** | Next.js 14, TypeScript, TailwindCSS, Three.js, Wagmi |
-| **Backend** | NestJS, Express, Socket.io, Prisma |
-| **Agents** | Node.js 20, OpenAI SDK, Stability SDK |
-| **Storage** | PostgreSQL, Redis, Storacha, IPFS |
-| **Blockchain** | Hardhat, Solidity, Ethers.js, Polygon |
-| **DevOps** | Docker, GitHub Actions, Prometheus, Grafana |
-| **Testing** | Jest, fast-check, Supertest, k6 |
+| Layer          | Technology                                           |
+| -------------- | ---------------------------------------------------- |
+| **Frontend**   | Next.js 14, TypeScript, TailwindCSS, Three.js, Wagmi |
+| **Backend**    | NestJS, Express, Socket.io, Prisma                   |
+| **Agents**     | Node.js 20, OpenAI SDK, Stability SDK                |
+| **Storage**    | PostgreSQL, Redis, Storacha, IPFS                    |
+| **Blockchain** | Hardhat, Solidity, Ethers.js, Polygon                |
+| **DevOps**     | Docker, GitHub Actions, Prometheus, Grafana          |
+| **Testing**    | Jest, fast-check, Supertest, k6                      |
 
 ## 🎓 Kiro Integration
 
 HauntedAI showcases the full power of Kiro:
 
 ### Hooks
+
 - **on-save**: Automatically run tests when files are saved
 - **on-commit**: Run linter before commits
 
 ### Steering Docs
+
 - **code-standards.md**: Project coding standards
 - **architecture.md**: Architecture guidelines
 
 ### MCP Plugins
+
 - **Storacha Plugin**: Seamless IPFS integration
 - **OpenAI Plugin**: Direct AI model access
 
@@ -190,6 +205,7 @@ HauntedAI showcases the full power of Kiro:
 **Problem**: Traditional AI platforms are centralized, opaque, and don't reward users.
 
 **Solution**: HauntedAI is a fully autonomous, transparent, and rewarding AI platform where:
+
 - ✅ Agents work independently and visibly
 - ✅ All content is permanently stored on IPFS
 - ✅ Users earn tokens and NFTs for participation
@@ -200,6 +216,7 @@ HauntedAI showcases the full power of Kiro:
 ## 📊 Current Status & Metrics
 
 ### ✅ Completed (Phase 1)
+
 - **Project Structure**: Monorepo with TypeScript, ESLint, Prettier
 - **Docker Environment**: Full stack containerization ready
 - **Database**: Prisma schema with 5 models (User, Room, Asset, Token, Badge)
@@ -209,11 +226,13 @@ HauntedAI showcases the full power of Kiro:
 - **Documentation**: Swagger/OpenAPI integration
 
 ### 🔄 In Progress (Phase 2)
+
 - **API Implementation**: Endpoints defined, logic pending
 - **Authentication**: Web3 wallet integration
 - **Property-Based Tests**: 81 properties to be implemented
 
 ### 📈 Metrics
+
 - **Test Coverage**: 37 unit tests passing ✅
 - **Code Quality**: ESLint + Prettier configured
 - **API Endpoints**: 15+ endpoints defined
@@ -246,4 +265,4 @@ This project is licensed under the MIT License - see the [LICENSE](./LICENSE) fi
 
 **Built with 💜 for the Kiro Hackathon**
 
-*Where Agents Come Alive* 👻
+_Where Agents Come Alive_ 👻

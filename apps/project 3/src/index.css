@@ -1,0 +1,122 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Creepster&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #0B0B0B;
+  --bg-secondary: #151515;
+  --primary: #FF6B00;
+  --primary-glow: rgba(255, 107, 0, 0.5);
+  --accent: #FF0040;
+  --accent-glow: rgba(255, 0, 64, 0.5);
+  --text: #E5E5E5;
+  --text-secondary: #999999;
+  --shadow-glow: 0 0 20px var(--primary-glow);
+  --shadow-accent: 0 0 30px var(--accent-glow);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.font-creepster {
+  font-family: 'Creepster', cursive;
+}
+
+@layer utilities {
+  .glow-primary {
+    box-shadow: var(--shadow-glow);
+  }
+
+  .glow-accent {
+    box-shadow: var(--shadow-accent);
+  }
+
+  .text-glow {
+    text-shadow: 0 0 20px currentColor;
+  }
+
+  .glass {
+    background: rgba(21, 21, 21, 0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+  }
+
+  .animate-pulse-glow {
+    animation: pulseGlow 2s ease-in-out infinite;
+  }
+
+  @keyframes pulseGlow {
+    0%, 100% {
+      box-shadow: 0 0 20px var(--primary-glow);
+      transform: scale(1);
+    }
+    50% {
+      box-shadow: 0 0 40px var(--primary-glow);
+      transform: scale(1.05);
+    }
+  }
+
+  .animate-flicker {
+    animation: flicker 3s ease-in-out infinite;
+  }
+
+  @keyframes flicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+    75% { opacity: 0.9; }
+  }
+}
+
+.bg-gradient-radial {
+  background: radial-gradient(circle at center, var(--bg-secondary) 0%, var(--bg) 100%);
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+button, a {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+button:hover, a:hover {
+  transform: translateY(-2px);
+}
+
+.page-transition {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
