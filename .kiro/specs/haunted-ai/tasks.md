@@ -340,13 +340,13 @@
   - Install OpenZeppelin contracts
   - _Requirements: 16.1_
 
-- [ ] 11.2 Implement HHCWToken contract (ERC20)
+- [x] 11.2 Implement HHCWToken contract (ERC20)
   - Write HHCWToken.sol with mint and burn functions
   - Add treasury access control
   - Write deployment script
   - _Requirements: 9.1, 9.2, 9.3_
 
-- [ ] 11.3 Implement GhostBadge contract (ERC721)
+- [x] 11.3 Implement GhostBadge contract (ERC721)
   - Write GhostBadge.sol with mintBadge function
   - Add badge type metadata
   - Implement tokenURI for metadata

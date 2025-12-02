@@ -1,0 +1,43 @@
+{
+  "timestamp": "2025-12-02T13:58:18.776Z",
+  "contract": "GhostBadge.sol",
+  "testsPassed": true,
+  "scenarios": [
+    {
+      "name": "Scenario 1: First Room Completion",
+      "status": "PASSED",
+      "user": "Alice",
+      "achievement": "Completed first room"
+    },
+    {
+      "name": "Scenario 2: Ten Rooms Milestone",
+      "status": "PASSED",
+      "user": "Bob",
+      "achievement": "Completed 10 rooms"
+    },
+    {
+      "name": "Scenario 3: Token Milestone",
+      "status": "PASSED",
+      "user": "Charlie",
+      "achievement": "Earned 1000 HHCW tokens"
+    },
+    {
+      "name": "Scenario 4: Legend Status",
+      "status": "PASSED",
+      "user": "Diana",
+      "achievement": "Completed 100 rooms"
+    },
+    {
+      "name": "Scenario 5: Multiple Badges",
+      "status": "PASSED",
+      "user": "Eve",
+      "achievement": "Complete progression"
+    }
+  ],
+  "gasUsage": {
+    "deployment": "See gas report above",
+    "mintBadge": "~114k gas",
+    "getBadgeType": "~8k gas",
+    "tokenURI": "~20k gas"
+  }
+}
