@@ -6,9 +6,23 @@
 echo "🎃 Starting HauntedAI Services..."
 echo ""
 
-# Export API keys
-export HUGGINGFACE_API_KEY="${HUGGINGFACE_API_KEY:-your-huggingface-key-here}"
-export POLLINATION_API_KEY="${POLLINATION_API_KEY:-your-pollination-key-here}"
+# Load env vars if available
+if [ -f ".env" ]; then
+  set -a
+  # shellcheck disable=SC1091
+  source ".env"
+  set +a
+fi
+
+# Ensure required API keys are present
+if [ -z "${HUGGINGFACE_API_KEY:-}" ] || [ -z "${POLLINATION_API_KEY:-}" ]; then
+  echo "❌ Missing required API keys. Set HUGGINGFACE_API_KEY and POLLINATION_API_KEY."
+  echo "   You can place them in an .env file or export them before running this script."
+  exit 1
+fi
+
+export HUGGINGFACE_API_KEY
+export POLLINATION_API_KEY
 
 # Colors
 GREEN='\033[0;32m'
@@ -17,8 +31,8 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 echo -e "${BLUE}📝 Configuration:${NC}"
-echo "  HUGGINGFACE_API_KEY: ${HUGGINGFACE_API_KEY:0:20}..."
-echo "  POLLINATION_API_KEY: ${POLLINATION_API_KEY:0:20}..."
+echo "  HUGGINGFACE_API_KEY: ${HUGGINGFACE_API_KEY:0:4}********"
+echo "  POLLINATION_API_KEY: ${POLLINATION_API_KEY:0:4}********"
 echo ""
 
 # Function to start a service

@@ -17,8 +17,13 @@
 const axios = require('axios');
 
 // Configuration
-const HUGGINGFACE_API_KEY = 'your-huggingface-api-key-here';
-const POLLINATION_API_KEY = process.env.POLLINATION_API_KEY || 'pol_test_key';
+const HUGGINGFACE_API_KEY = process.env.HUGGINGFACE_API_KEY;
+const POLLINATION_API_KEY = process.env.POLLINATION_API_KEY;
+
+if (!HUGGINGFACE_API_KEY || !POLLINATION_API_KEY) {
+  console.error('❌ Missing required API keys. Export HUGGINGFACE_API_KEY and POLLINATION_API_KEY.');
+  process.exit(1);
+}
 
 const SERVICES = {
   storyAgent: 'http://localhost:3001',
