@@ -1,0 +1,36 @@
+{
+  "name": "@hauntedai/blockchain",
+  "version": "1.0.0",
+  "description": "Smart contracts for HauntedAI platform",
+  "private": true,
+  "scripts": {
+    "build": "forge build",
+    "test": "forge test",
+    "test:gas": "forge test --gas-report",
+    "test:coverage": "forge coverage",
+    "test:verbose": "forge test -vvv",
+    "clean": "forge clean",
+    "format": "forge fmt",
+    "format:check": "forge fmt --check",
+    "deploy:local": "forge script script/Deploy.s.sol --rpc-url localhost --broadcast",
+    "deploy:sepolia": "forge script script/Deploy.s.sol --rpc-url sepolia --broadcast --verify",
+    "deploy:mumbai": "forge script script/Deploy.s.sol --rpc-url mumbai --broadcast --verify",
+    "deploy:amoy": "forge script script/Deploy.s.sol --rpc-url amoy --broadcast --verify",
+    "deploy:polygon": "forge script script/Deploy.s.sol --rpc-url polygon --broadcast --verify",
+    "anvil": "anvil",
+    "snapshot": "forge snapshot",
+    "lint": "forge fmt --check"
+  },
+  "keywords": [
+    "solidity",
+    "ethereum",
+    "polygon",
+    "smart-contracts",
+    "foundry",
+    "erc20",
+    "erc721",
+    "nft"
+  ],
+  "author": "HauntedAI Team",
+  "license": "MIT"
+}

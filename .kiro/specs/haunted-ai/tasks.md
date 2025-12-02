@@ -334,7 +334,7 @@
   - Ensure all tests pass, ask the user if questions arise.
 
 - [-] 11. Smart Contracts (Solidity)
-- [-] 11.1 Set up foundry  project
+- [x] 11.1 Set up foundry  project
   - Initialize Hardhat in apps/blockchain
   - Configure networks (localhost, eth testnet , Mumbai testnet, Polygon testnet )
   - Install OpenZeppelin contracts

@@ -1,0 +1,139 @@
+{
+  "networks": {
+    "localhost": {
+      "chainId": 31337,
+      "name": "Localhost",
+      "rpcUrl": "http://localhost:8545",
+      "explorer": null,
+      "nativeCurrency": {
+        "name": "Ether",
+        "symbol": "ETH",
+        "decimals": 18
+      }
+    },
+    "sepolia": {
+      "chainId": 11155111,
+      "name": "Sepolia Testnet",
+      "rpcUrl": "https://eth-sepolia.g.alchemy.com/v2/",
+      "explorer": "https://sepolia.etherscan.io",
+      "nativeCurrency": {
+        "name": "Sepolia Ether",
+        "symbol": "ETH",
+        "decimals": 18
+      }
+    },
+    "mumbai": {
+      "chainId": 80001,
+      "name": "Mumbai Testnet",
+      "rpcUrl": "https://polygon-mumbai.g.alchemy.com/v2/",
+      "explorer": "https://mumbai.polygonscan.com",
+      "nativeCurrency": {
+        "name": "MATIC",
+        "symbol": "MATIC",
+        "decimals": 18
+      },
+      "deprecated": true,
+      "note": "Mumbai testnet is deprecated. Use Amoy instead."
+    },
+    "amoy": {
+      "chainId": 80002,
+      "name": "Amoy Testnet",
+      "rpcUrl": "https://rpc-amoy.polygon.technology",
+      "explorer": "https://amoy.polygonscan.com",
+      "nativeCurrency": {
+        "name": "MATIC",
+        "symbol": "MATIC",
+        "decimals": 18
+      }
+    },
+    "polygon": {
+      "chainId": 137,
+      "name": "Polygon Mainnet",
+      "rpcUrl": "https://polygon-mainnet.g.alchemy.com/v2/",
+      "explorer": "https://polygonscan.com",
+      "nativeCurrency": {
+        "name": "MATIC",
+        "symbol": "MATIC",
+        "decimals": 18
+      }
+    },
+    "bsc": {
+      "chainId": 56,
+      "name": "BSC Mainnet",
+      "rpcUrl": "https://bsc-dataseed1.binance.org",
+      "explorer": "https://bscscan.com",
+      "nativeCurrency": {
+        "name": "BNB",
+        "symbol": "BNB",
+        "decimals": 18
+      }
+    },
+    "bsc_testnet": {
+      "chainId": 97,
+      "name": "BSC Testnet",
+      "rpcUrl": "https://data-seed-prebsc-1-s1.binance.org:8545",
+      "explorer": "https://testnet.bscscan.com",
+      "nativeCurrency": {
+        "name": "BNB",
+        "symbol": "BNB",
+        "decimals": 18
+      }
+    }
+  },
+  "contracts": {
+    "HHCWToken": {
+      "name": "Haunted Halloween Coin Wrapper",
+      "symbol": "HHCW",
+      "decimals": 18,
+      "initialSupply": 0
+    },
+    "GhostBadge": {
+      "name": "Ghost Badge",
+      "symbol": "GHOST",
+      "baseURI": "ipfs://",
+      "badgeTypes": [
+        {
+          "name": "Ghost Hunter",
+          "description": "Awarded for completing 10 rooms",
+          "requirement": "10 rooms completed"
+        },
+        {
+          "name": "Haunted Master",
+          "description": "Awarded for earning 1000 HHCW tokens",
+          "requirement": "1000 HHCW earned"
+        },
+        {
+          "name": "Early Adopter",
+          "description": "Awarded to first 100 users",
+          "requirement": "Be among first 100 users"
+        },
+        {
+          "name": "Content Creator",
+          "description": "Awarded for 50 content uploads",
+          "requirement": "50 content uploads"
+        }
+      ]
+    },
+    "Treasury": {
+      "rewards": {
+        "upload": "10000000000000000000",
+        "view": "1000000000000000000",
+        "referral": "50000000000000000000"
+      },
+      "rewardsReadable": {
+        "upload": "10 HHCW",
+        "view": "1 HHCW",
+        "referral": "50 HHCW"
+      }
+    }
+  },
+  "reference": {
+    "note": "AION Vault contracts are provided as reference only",
+    "aionVault": {
+      "mainContract": "0xB176c1FA7B3feC56cB23681B6E447A7AE60C5254",
+      "network": "BSC Mainnet",
+      "verified": true,
+      "deploymentDate": "2024-12-13"
+    }
+  }
+}
