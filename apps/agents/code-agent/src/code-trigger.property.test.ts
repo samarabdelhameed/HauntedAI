@@ -23,7 +23,7 @@ describe('Property 9: Image completion triggers code generation', () => {
 
   beforeAll(() => {
     // Set required environment variable
-    process.env.GEMINI_API_KEY = 'test-gemini-key-for-testing';
+    process.env.HUGGINGFACE_API_KEY = 'hf_test_key_for_testing';
   });
 
   beforeEach(() => {
@@ -45,9 +45,9 @@ describe('Property 9: Image completion triggers code generation', () => {
           // Mock the service methods
           codeService = new CodeService();
 
-          // Mock Gemini API call
-          const mockGemini = jest.spyOn(codeService as any, 'callGeminiForCode');
-          mockGemini.mockResolvedValue('<html><body>Test game</body></html>');
+          // Mock HuggingFace API call
+          const mockHF = jest.spyOn(codeService as any, 'callHuggingFaceForCode');
+          mockHF.mockResolvedValue('<html><body>Test game</body></html>');
 
           // Mock Storacha upload
           const mockStoracha = jest.spyOn(
@@ -69,8 +69,8 @@ describe('Property 9: Image completion triggers code generation', () => {
           const duration = endTime - startTime;
 
           // Verify code generation was triggered
-          expect(mockGemini).toHaveBeenCalledTimes(1);
-          expect(mockGemini).toHaveBeenCalledWith(input.story, input.imageTheme);
+          expect(mockHF).toHaveBeenCalledTimes(1);
+          expect(mockHF).toHaveBeenCalledWith(input.story, input.imageTheme);
 
           // Verify result contains code and CID
           expect(result.code).toBeDefined();
@@ -98,8 +98,8 @@ describe('Property 9: Image completion triggers code generation', () => {
           codeService = new CodeService();
 
           // Mock the service methods
-          const mockGemini = jest.spyOn(codeService as any, 'callGeminiForCode');
-          mockGemini.mockResolvedValue('<html><body>Test game</body></html>');
+          const mockHF = jest.spyOn(codeService as any, 'callHuggingFaceForCode');
+          mockHF.mockResolvedValue('<html><body>Test game</body></html>');
 
           const mockStoracha = jest.spyOn(
             (codeService as any).storachaClient,
@@ -114,7 +114,7 @@ describe('Property 9: Image completion triggers code generation', () => {
           });
 
           // Verify code generation was triggered with correct inputs
-          expect(mockGemini).toHaveBeenCalledWith(story, imageTheme);
+          expect(mockHF).toHaveBeenCalledWith(story, imageTheme);
 
           // Verify result structure
           expect(result).toHaveProperty('code');

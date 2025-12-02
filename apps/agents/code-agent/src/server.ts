@@ -11,8 +11,14 @@ const PORT = process.env.PORT || 3004;
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 
-// Initialize service
-const codeService = new CodeService();
+// Lazy-initialize service to ensure env vars are loaded
+let codeService: CodeService | null = null;
+function getCodeService(): CodeService {
+  if (!codeService) {
+    codeService = new CodeService();
+  }
+  return codeService;
+}
 
 /**
  * Health check endpoint
@@ -50,7 +56,7 @@ app.post('/generate', async (req: Request, res: Response) => {
     console.log(`Image theme: ${request.imageTheme}`);
 
     // Generate code
-    const result = await codeService.generateCode(request);
+    const result = await getCodeService().generateCode(request);
 
     console.log('Code generation completed successfully');
     console.log(`CID: ${result.cid}`);

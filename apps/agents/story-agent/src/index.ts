@@ -6,16 +6,19 @@ import { StoryAgentServer } from './server';
 dotenv.config();
 
 // Validate required environment variables
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const PORT = parseInt(process.env.PORT || '3002', 10);
+const GROQ_API_KEY = process.env.GROQ_API_KEY || process.env.HUGGINGFACE_API_KEY;
+const PORT = parseInt(process.env.PORT || '3001', 10);
 
-if (!OPENAI_API_KEY) {
-  console.error('❌ Error: OPENAI_API_KEY environment variable is required');
+if (!GROQ_API_KEY) {
+  console.error('❌ Error: GROQ_API_KEY environment variable is required');
+  console.error('Get your free API key from: https://console.groq.com/keys');
   process.exit(1);
 }
 
+console.log('✅ Using Groq API for story generation (FREE, super fast!)');
+
 // Create and start server
-const server = new StoryAgentServer(OPENAI_API_KEY, PORT);
+const server = new StoryAgentServer(GROQ_API_KEY, PORT);
 server.start();
 
 // Graceful shutdown

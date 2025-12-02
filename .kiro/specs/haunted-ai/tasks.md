@@ -2,7 +2,7 @@
 
 ## Task List
 
-- [ ] 1. Project Setup and Infrastructure
+- [x] 1. Project Setup and Infrastructure
 - [x] 1.1 Initialize monorepo structure with workspaces
   - Create root package.json with workspaces for apps/web, apps/api, apps/agents
   - Set up TypeScript configuration with shared tsconfig.base.json
@@ -29,7 +29,7 @@
   - Set up branch protection rules
   - _Requirements: 15.1, 15.2_
 
-- [x] 1.5 Write unit tests for database operations
+- [ ] 1.5 Write unit tests for database operations
   - Test user CRUD operations
   - Test room CRUD operations
   - Test asset CRUD operations
@@ -300,43 +300,43 @@
   - Save code metadata to database
   - _Requirements: 3.4_
 
-- [ ] 9. DeployAgent Service
-- [ ] 9.1 Create DeployAgent micro-service
+- [x] 9. DeployAgent Service
+- [x] 9.1 Create DeployAgent micro-service
   - Initialize Node.js service with Express
   - Install Vercel SDK or IPFS deployment tools
   - Create POST /deploy endpoint
   - Implement health check endpoint
   - _Requirements: 4.1_
 
-- [ ] 9.2 Implement deployment to Vercel or IPFS
+- [x] 9.2 Implement deployment to Vercel or IPFS
   - Fetch code from IPFS using CID
   - Deploy to Vercel using API or publish to IPFS gateway
   - Return deployment URL
   - _Requirements: 4.1, 4.2_
 
-- [ ] 9.3 Write property test for deployment trigger
+- [x] 9.3 Write property test for deployment trigger
   - **Property 12: Code completion triggers deployment**
   - **Property 13: Deployment information persistence**
   - **Validates: Requirements 4.1, 4.2**
 
-- [ ] 9.4 Add deployment retry logic
+- [x] 9.4 Add deployment retry logic
   - Implement exponential backoff for deployment failures
   - Handle API rate limits
   - Log all retry attempts
   - _Requirements: 4.4_
 
-- [ ] 9.5 Send deployment completion notification
+- [x] 9.5 Send deployment completion notification
   - Emit WebSocket event on successful deployment
   - Include deployment URL and CID
   - _Requirements: 4.3_
 
-- [ ] 10. Checkpoint - Ensure all agent services tests pass
+- [x] 10. Checkpoint - Ensure all agent services tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 11. Smart Contracts (Solidity)
-- [ ] 11.1 Set up Hardhat project
+- [ ] 11.1 Set up foundry  project
   - Initialize Hardhat in apps/blockchain
-  - Configure networks (localhost, Mumbai testnet, Polygon mainnet)
+  - Configure networks (localhost, eth testnet , Mumbai testnet, Polygon testnet )
   - Install OpenZeppelin contracts
   - _Requirements: 16.1_
 

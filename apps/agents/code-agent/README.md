@@ -4,15 +4,23 @@
 
 ## Overview
 
-CodeAgent is a micro-service that generates spooky mini-game code using Google Gemini Pro. It takes a story and image theme as input, generates HTML/JavaScript code, tests it for security issues, auto-patches errors, and uploads the final code to Storacha/IPFS.
+CodeAgent is a micro-service that generates spooky mini-game code using **HuggingFace CodeLlama (FREE!)**. It takes a story and image theme as input, generates HTML/JavaScript code, tests it for security issues, auto-patches errors, and uploads the final code to Storacha/IPFS.
+
+### 🎉 Why HuggingFace?
+- ✅ **100% FREE** - 30,000 requests/day
+- ✅ **No Credit Card** - Just email signup
+- ✅ **No Quota Issues** - Much higher limits
+- ✅ **CodeLlama Model** - Specialized for code generation
 
 ## Features
 
-- 🎮 **Code Generation**: Creates complete HTML/JS mini-games using Google Gemini Pro
+- 🎮 **Code Generation**: Creates complete HTML/JS mini-games using HuggingFace CodeLlama (FREE!)
 - 🔒 **Security Testing**: Validates code for dangerous patterns (eval, inline handlers)
 - 🔧 **Auto-Patching**: Automatically fixes errors up to 3 times
 - 📦 **Storacha Integration**: Uploads code to decentralized storage
 - ✅ **Code Validation**: Runs security and syntax checks on generated JavaScript
+- 🔄 **Smart Retry**: 5 attempts with exponential backoff
+- ⚡ **Model Loading**: Automatic wait when model is loading
 
 ## API Endpoints
 
@@ -57,14 +65,21 @@ Response:
 ## Environment Variables
 
 ```bash
-# Required
-GEMINI_API_KEY=your_gemini_api_key
+# Required (FREE - Get from https://huggingface.co/settings/tokens)
+HUGGINGFACE_API_KEY=hf_your_token_here
 
 # Optional
 PORT=3004
 NODE_ENV=development
 SERVICE_NAME=code-agent
 ```
+
+### How to Get FREE HuggingFace Token:
+1. Visit: https://huggingface.co/join
+2. Sign up with email (no credit card!)
+3. Go to: https://huggingface.co/settings/tokens
+4. Click "New token" and copy it
+5. Add to `.env` file
 
 ## Installation
 
@@ -98,11 +113,17 @@ npm run test:watch
 ## Code Generation Process
 
 1. **Receive Request**: Story + image theme
-2. **Generate Code**: Call Google Gemini Pro with spooky game prompt
+2. **Generate Code**: Call HuggingFace CodeLlama with spooky game prompt
 3. **Test Code**: Run security and syntax checks
 4. **Auto-Patch**: If tests fail, generate patch (up to 3 attempts)
 5. **Upload**: Upload final code to Storacha
 6. **Return**: Return code + CID
+
+### Smart Retry Logic:
+- 5 retry attempts with exponential backoff
+- Automatic wait when model is loading (503 errors)
+- Rate limit handling (429 errors)
+- Network error recovery
 
 ## Security Checks
 
@@ -144,9 +165,20 @@ CodeAgent
 
 ## Error Handling
 
-- **Gemini API Failures**: Returns 500 with error message
+- **HuggingFace API Failures**: Returns 500 with error message
+- **Model Loading (503)**: Automatic wait and retry
+- **Rate Limiting (429)**: Exponential backoff retry
 - **Validation Failures**: Auto-patches up to 3 times
 - **Upload Failures**: Retries with exponential backoff (3 attempts)
+
+## API Limits (FREE Tier)
+
+**HuggingFace Free Tier** (CodeLlama):
+- ✅ **30,000 requests per day** (20x more than Gemini!)
+- ✅ **3,000 requests per hour**
+- ✅ **10 concurrent requests**
+- ✅ **No credit card required**
+- ✅ **No quota exceeded issues**
 
 ## Correctness Properties
 

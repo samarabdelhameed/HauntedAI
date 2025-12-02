@@ -17,6 +17,7 @@ export interface AssetGenerationResponse {
     height: number;
     generatedAt: Date;
     model: string;
+    provider?: string;
     prompt: string;
   };
 }

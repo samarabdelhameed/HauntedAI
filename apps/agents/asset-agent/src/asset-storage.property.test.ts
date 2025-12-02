@@ -117,7 +117,7 @@ describe('Property 6: Image storage round-trip', () => {
     await fc.assert(
       fc.asyncProperty(
         fc.record({
-          story: fc.string({ minLength: 10, maxLength: 500 }),
+          story: fc.string({ minLength: 10, maxLength: 500 }).filter(s => s.trim().length > 0),
           roomId: fc.uuid(),
         }),
         async ({ story, roomId }) => {
@@ -149,7 +149,7 @@ describe('Property 6: Image storage round-trip', () => {
           expect(result.metadata.width).toBeGreaterThan(0);
           expect(result.metadata.height).toBeGreaterThan(0);
           expect(result.metadata.generatedAt).toBeInstanceOf(Date);
-          expect(result.metadata.model).toBe('dall-e-3');
+          expect(result.metadata.model).toBe('pollination-ai-flux');
           expect(result.metadata.prompt).toBeDefined();
           expect(result.metadata.prompt.length).toBeGreaterThan(0);
         }

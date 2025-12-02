@@ -2,18 +2,33 @@
 
 **Managed by Kiro** | Part of HauntedAI Platform
 
+## ✨ NEW: FREE Image Generation!
+
+AssetAgent now uses **Pollination AI** - completely FREE with no API key required!
+
 ## Overview
 
-AssetAgent is a micro-service that generates spooky images using OpenAI's DALL-E 3 based on story content. It automatically creates atmospheric, gothic horror images and stores them on the decentralized Storacha/IPFS network.
+AssetAgent is a micro-service that generates spooky images using **Pollination AI (FREE)** based on story content. It automatically creates atmospheric, gothic horror images and stores them on the decentralized Storacha/IPFS network.
 
 ## Features
 
-- 🎨 **DALL-E 3 Integration**: High-quality image generation with spooky styling
+- ✨ **Pollination AI (FREE)**: No API key needed, unlimited usage, < 2 seconds generation
+- 🎨 **High Quality**: Similar to DALL-E 2 quality
 - 📦 **Storacha Storage**: Decentralized storage with CID tracking
 - 🔄 **Retry Logic**: Exponential backoff for API failures (3 attempts)
 - 🗜️ **Image Optimization**: Automatic compression for images > 1MB
 - 🏥 **Health Checks**: Built-in health monitoring endpoint
 - 📝 **Comprehensive Logging**: Detailed operation logging
+
+## Why Pollination AI?
+
+| Feature | Pollination AI | DALL-E 3 |
+|---------|---------------|----------|
+| **Cost** | FREE ∞ | $0.04/image |
+| **API Key** | Not needed | Required |
+| **Speed** | < 2 seconds | 3-5 seconds |
+| **Quality** | ≈ DALL-E 2 | Highest |
+| **Limits** | Unlimited | Rate limited |
 
 ## Requirements
 
