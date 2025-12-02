@@ -371,14 +371,14 @@
   - Save contract addresses to environment variables
   - _Requirements: 9.1, 16.1_
 
-- [ ] 11.7 Write property test for token rewards
+- [x] 11.7 Write property test for token rewards
   - **Property 30: Upload reward amount**
   - **Property 31: View reward amount**
   - **Property 32: Referral reward amount**
   - **Property 33: Transaction logging**
   - **Validates: Requirements 9.1, 9.2, 9.3, 9.4**
 
-- [ ] 11.8 Write property test for NFT badges
+- [x] 11.8 Write property test for NFT badges
   - **Property 59: Achievement badge minting**
   - **Property 60: Milestone badge minting**
   - **Property 61: Badge transaction recording**

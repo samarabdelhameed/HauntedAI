@@ -66,7 +66,7 @@ export class TokensService {
     const transaction = await this.prisma.tokenTransaction.create({
       data: {
         userId,
-        amount: BigInt(amount),
+        amount,
         reason,
         txHash,
       },

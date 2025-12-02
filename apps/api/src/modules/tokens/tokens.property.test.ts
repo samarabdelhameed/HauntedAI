@@ -57,7 +57,7 @@ describe('Token Rewards Property-Based Tests', () => {
             const mockTransaction = {
               id: fc.sample(fc.uuid(), 1)[0],
               userId,
-              amount: BigInt(10),
+              amount: 10,
               reason,
               txHash: null,
               createdAt: new Date(),
@@ -69,11 +69,11 @@ describe('Token Rewards Property-Based Tests', () => {
             const result = await service.rewardUser(userId, 10, reason);
 
             // Property: Upload rewards should always be exactly 10 tokens
-            expect(result.amount).toBe(BigInt(10));
+            expect(result.amount).toBe(10);
             expect(prismaService.tokenTransaction.create).toHaveBeenCalledWith({
               data: {
                 userId,
-                amount: BigInt(10),
+                amount: 10,
                 reason,
                 txHash: undefined,
               },
@@ -96,7 +96,7 @@ describe('Token Rewards Property-Based Tests', () => {
             const mockTransaction = {
               id: fc.sample(fc.uuid(), 1)[0],
               userId,
-              amount: BigInt(10),
+              amount: 10,
               reason,
               txHash: null,
               createdAt: new Date(),
@@ -108,7 +108,7 @@ describe('Token Rewards Property-Based Tests', () => {
 
             // Property: Upload reward transactions should have upload-related reason
             expect(result.reason).toContain('upload');
-            expect(result.amount).toBe(BigInt(10));
+            expect(result.amount).toBe(10);
           }
         ),
         { numRuns: 100 }
@@ -134,7 +134,7 @@ describe('Token Rewards Property-Based Tests', () => {
             const mockTransaction = {
               id: fc.sample(fc.uuid(), 1)[0],
               userId,
-              amount: BigInt(1),
+              amount: 1,
               reason,
               txHash: null,
               createdAt: new Date(),
@@ -146,11 +146,11 @@ describe('Token Rewards Property-Based Tests', () => {
             const result = await service.rewardUser(userId, 1, reason);
 
             // Property: View rewards should always be exactly 1 token
-            expect(result.amount).toBe(BigInt(1));
+            expect(result.amount).toBe(1);
             expect(prismaService.tokenTransaction.create).toHaveBeenCalledWith({
               data: {
                 userId,
-                amount: BigInt(1),
+                amount: 1,
                 reason,
                 txHash: undefined,
               },
@@ -173,7 +173,7 @@ describe('Token Rewards Property-Based Tests', () => {
             const mockTransaction = {
               id: fc.sample(fc.uuid(), 1)[0],
               userId,
-              amount: BigInt(1),
+              amount: 1,
               reason,
               txHash: null,
               createdAt: new Date(),
@@ -185,7 +185,348 @@ describe('Token Rewards Property-Based Tests', () => {
 
             // Property: View reward transactions should have view-related reason
             expect(result.reason).toContain('view');
-            expect(result.amount).toBe(BigInt(1));
+            expect(result.amount).toBe(1);
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+  });
+
+  // Feature: haunted-ai, Property 32: Referral reward amount
+  // Validates: Requirements 9.3
+  describe('Property 32: Referral reward amount', () => {
+    it('should reward exactly 50 tokens for any successful referral', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.record({
+            userId: fc.uuid(),
+            referredUserId: fc.uuid(),
+            reason: fc.constantFrom('referral', 'friend_referral', 'user_referral'),
+          }),
+          async ({ userId, referredUserId, reason }) => {
+            // Reset mocks
+            jest.clearAllMocks();
+
+            // Mock the reward transaction creation
+            const mockTransaction = {
+              id: fc.sample(fc.uuid(), 1)[0],
+              userId,
+              amount: 50,
+              reason,
+              txHash: null,
+              createdAt: new Date(),
+            };
+
+            jest.spyOn(prismaService.tokenTransaction, 'create').mockResolvedValue(mockTransaction);
+
+            // Execute reward
+            const result = await service.rewardUser(userId, 50, reason);
+
+            // Property: Referral rewards should always be exactly 50 tokens
+            expect(result.amount).toBe(50);
+            expect(prismaService.tokenTransaction.create).toHaveBeenCalledWith({
+              data: {
+                userId,
+                amount: 50,
+                reason,
+                txHash: undefined,
+              },
+            });
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should record referral rewards with correct reason', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.uuid(),
+          async (userId) => {
+            // Reset mocks
+            jest.clearAllMocks();
+
+            const reason = 'friend_referral';
+            const mockTransaction = {
+              id: fc.sample(fc.uuid(), 1)[0],
+              userId,
+              amount: 50,
+              reason,
+              txHash: null,
+              createdAt: new Date(),
+            };
+
+            jest.spyOn(prismaService.tokenTransaction, 'create').mockResolvedValue(mockTransaction);
+
+            const result = await service.rewardUser(userId, 50, reason);
+
+            // Property: Referral reward transactions should have referral-related reason
+            expect(result.reason).toContain('referral');
+            expect(result.amount).toBe(50);
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should maintain correct referral reward amount across multiple referrals', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.record({
+            userId: fc.uuid(),
+            referralCount: fc.integer({ min: 1, max: 10 }),
+          }),
+          async ({ userId, referralCount }) => {
+            // Reset mocks
+            jest.clearAllMocks();
+
+            const mockTransactions = [];
+            for (let i = 0; i < referralCount; i++) {
+              const mockTransaction = {
+                id: `tx-${i}`,
+                userId,
+                amount: 50,
+                reason: `referral_${i}`,
+                txHash: null,
+                createdAt: new Date(),
+              };
+              mockTransactions.push(mockTransaction);
+
+              jest.spyOn(prismaService.tokenTransaction, 'create').mockResolvedValueOnce(mockTransaction);
+
+              const result = await service.rewardUser(userId, 50, `referral_${i}`);
+
+              // Property: Each referral should always reward exactly 50 tokens
+              expect(result.amount).toBe(50);
+            }
+
+            // Verify all referrals were processed
+            expect(prismaService.tokenTransaction.create).toHaveBeenCalledTimes(referralCount);
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+  });
+
+  // Feature: haunted-ai, Property 33: Transaction logging
+  // Validates: Requirements 9.4
+  describe('Property 33: Transaction logging', () => {
+    it('should record transaction with valid Polygon tx_hash pattern', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.record({
+            userId: fc.uuid(),
+            amount: fc.integer({ min: 1, max: 100 }),
+            reason: fc.constantFrom('upload', 'view', 'referral'),
+          }),
+          fc.array(fc.constantFrom('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'), { minLength: 64, maxLength: 64 }),
+          async ({ userId, amount, reason }, hexArray) => {
+            const txHash = `0x${hexArray.join('')}`;
+            // Reset mocks
+            jest.clearAllMocks();
+
+            const mockTransaction = {
+              id: fc.sample(fc.uuid(), 1)[0],
+              userId,
+              amount,
+              reason,
+              txHash,
+              createdAt: new Date(),
+            };
+
+            jest.spyOn(prismaService.tokenTransaction, 'create').mockResolvedValue(mockTransaction);
+
+            // Execute reward with tx_hash
+            const result = await service.rewardUser(userId, amount, reason, txHash);
+
+            // Property: Transaction should be logged with valid Polygon tx_hash
+            expect(result.txHash).toMatch(/^0x[a-fA-F0-9]{64}$/);
+            expect(result.userId).toBe(userId);
+            expect(result.amount).toBe(amount);
+            expect(result.reason).toBe(reason);
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should record transaction with all required fields', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.record({
+            userId: fc.uuid(),
+            amount: fc.integer({ min: 1, max: 100 }),
+            reason: fc.string({ minLength: 3, maxLength: 50 }),
+          }),
+          async ({ userId, amount, reason }) => {
+            // Reset mocks
+            jest.clearAllMocks();
+
+            const mockTransaction = {
+              id: fc.sample(fc.uuid(), 1)[0],
+              userId,
+              amount,
+              reason,
+              txHash: null,
+              createdAt: new Date(),
+            };
+
+            jest.spyOn(prismaService.tokenTransaction, 'create').mockResolvedValue(mockTransaction);
+
+            const result = await service.rewardUser(userId, amount, reason);
+
+            // Property: Every transaction must have userId, amount, reason, and createdAt
+            expect(result.userId).toBe(userId);
+            expect(result.amount).toBe(amount);
+            expect(result.reason).toBe(reason);
+            expect(result.createdAt).toBeInstanceOf(Date);
+            expect(result.id).toBeDefined();
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should maintain transaction order by creation time', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.record({
+            userId: fc.uuid(),
+            transactionCount: fc.integer({ min: 2, max: 10 }),
+          }),
+          async ({ userId, transactionCount }) => {
+            // Reset mocks
+            jest.clearAllMocks();
+
+            const mockTransactions = [];
+            const baseTime = Date.now();
+
+            // Create transactions with incrementing timestamps
+            for (let i = 0; i < transactionCount; i++) {
+              const mockTransaction = {
+                id: `tx-${i}`,
+                userId,
+                amount: 10,
+                reason: `transaction_${i}`,
+                txHash: null,
+                createdAt: new Date(baseTime + i * 1000),
+              };
+              mockTransactions.push(mockTransaction);
+            }
+
+            // Mock findMany to return transactions in order
+            jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue({
+              id: userId,
+              did: `did:key:${userId}`,
+              username: 'testuser',
+              walletAddress: null,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            });
+
+            jest.spyOn(prismaService.tokenTransaction, 'findMany').mockResolvedValue(mockTransactions);
+
+            const result = await service.getTransactions(`did:key:${userId}`);
+
+            // Property: Transactions should maintain chronological order
+            for (let i = 1; i < result.length; i++) {
+              const prevTime = result[i - 1].createdAt.getTime();
+              const currTime = result[i].createdAt.getTime();
+              expect(currTime).toBeGreaterThanOrEqual(prevTime);
+            }
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should record transaction with optional blockchain tx_hash', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.record({
+            userId: fc.uuid(),
+            amount: fc.integer({ min: 1, max: 100 }),
+            reason: fc.string({ minLength: 3, maxLength: 50 }),
+            includeTxHash: fc.boolean(),
+          }),
+          async ({ userId, amount, reason, includeTxHash }) => {
+            // Reset mocks
+            jest.clearAllMocks();
+
+            const txHash = includeTxHash 
+              ? `0x${fc.sample(fc.array(fc.constantFrom('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'), { minLength: 64, maxLength: 64 }), 1)[0].join('')}`
+              : null;
+
+            const mockTransaction = {
+              id: fc.sample(fc.uuid(), 1)[0],
+              userId,
+              amount,
+              reason,
+              txHash,
+              createdAt: new Date(),
+            };
+
+            jest.spyOn(prismaService.tokenTransaction, 'create').mockResolvedValue(mockTransaction);
+
+            const result = await service.rewardUser(userId, amount, reason, txHash || undefined);
+
+            // Property: Transaction can be recorded with or without blockchain tx_hash
+            if (includeTxHash) {
+              expect(result.txHash).toMatch(/^0x[a-fA-F0-9]{64}$/);
+            } else {
+              expect(result.txHash).toBeNull();
+            }
+            expect(result.userId).toBe(userId);
+            expect(result.amount).toBe(amount);
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should persist transaction data correctly', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.record({
+            userId: fc.uuid(),
+            amount: fc.integer({ min: 1, max: 1000 }),
+            reason: fc.constantFrom('upload', 'view', 'referral', 'bonus', 'reward'),
+          }),
+          fc.option(fc.array(fc.constantFrom('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'), { minLength: 64, maxLength: 64 }), { nil: null }),
+          async ({ userId, amount, reason }, hexOption) => {
+            const txHash = hexOption ? `0x${hexOption.join('')}` : null;
+            // Reset mocks
+            jest.clearAllMocks();
+
+            const mockTransaction = {
+              id: fc.sample(fc.uuid(), 1)[0],
+              userId,
+              amount,
+              reason,
+              txHash,
+              createdAt: new Date(),
+            };
+
+            jest.spyOn(prismaService.tokenTransaction, 'create').mockResolvedValue(mockTransaction);
+
+            const result = await service.rewardUser(userId, amount, reason, txHash || undefined);
+
+            // Property: All transaction data should be persisted correctly
+            expect(prismaService.tokenTransaction.create).toHaveBeenCalledWith({
+              data: {
+                userId,
+                amount,
+                reason,
+                txHash: txHash || undefined,
+              },
+            });
+
+            expect(result.userId).toBe(userId);
+            expect(result.amount).toBe(amount);
+            expect(result.reason).toBe(reason);
+            expect(result.txHash).toBe(txHash);
           }
         ),
         { numRuns: 100 }
@@ -232,7 +573,7 @@ describe('Token Rewards Property-Based Tests', () => {
             const mockTransactions = transactions.map((tx, index) => ({
               id: `tx-${index}`,
               userId,
-              amount: BigInt(tx.amount),
+              amount: tx.amount,
               reason: tx.reason,
               txHash: null,
               createdAt: new Date(),
@@ -327,7 +668,7 @@ describe('Token Rewards Property-Based Tests', () => {
             const mockTransactions = transactions.map((amount, index) => ({
               id: `tx-${index}`,
               userId,
-              amount: BigInt(amount),
+              amount: amount,
               reason: 'test',
               txHash: null,
               createdAt: new Date(),
@@ -386,7 +727,7 @@ describe('Token Rewards Property-Based Tests', () => {
             const mockTransactions = allAmounts.map((amount, index) => ({
               id: `tx-${index}`,
               userId,
-              amount: BigInt(amount),
+              amount: amount,
               reason: amount > 0 ? 'reward' : 'deduction',
               txHash: null,
               createdAt: new Date(),
