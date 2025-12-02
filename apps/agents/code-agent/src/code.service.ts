@@ -22,7 +22,7 @@ export class CodeService {
     }
 
     this.genAI = new GoogleGenerativeAI(apiKey);
-    this.model = this.genAI.getGenerativeModel({ model: 'gemini-pro' });
+    this.model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
     this.storachaClient = new StorachaClient();
   }
 
