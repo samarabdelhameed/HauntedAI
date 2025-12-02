@@ -352,7 +352,7 @@
   - Implement tokenURI for metadata
   - _Requirements: 16.1, 16.2_
 
-- [ ] 11.4 Implement Treasury contract
+- [x] 11.4 Implement Treasury contract
   - Write Treasury.sol with reward functions
   - Add rewardUpload, rewardView, rewardReferral functions
   - Add grantBadge function
@@ -365,9 +365,9 @@
   - Test access control
   - _Requirements: 9.1, 16.1_
 
-- [ ] 11.6 Deploy contracts to Mumbai testnet
+- [ ] 11.6 Deploy contracts to bnb testnet
   - Deploy HHCWToken, GhostBadge, Treasury
-  - Verify contracts on Polygonscan
+  - Verify contracts on bnbscan
   - Save contract addresses to environment variables
   - _Requirements: 9.1, 16.1_
 
