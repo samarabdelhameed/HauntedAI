@@ -32,6 +32,17 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* RTL Support */
+[dir="rtl"] {
+  direction: rtl;
+  text-align: right;
+}
+
+[dir="rtl"] .font-creepster {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+}
+
 .font-creepster {
   font-family: 'Creepster', cursive;
 }

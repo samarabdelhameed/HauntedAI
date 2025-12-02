@@ -98,8 +98,6 @@ export class TokensController {
   async rewardReferral(@Body() body: { userId: string }) {
     return this.tokensService.rewardReferral(body.userId);
   }
-}
-
 
   @Post('tokens/check-badges')
   @UseGuards(JwtAuthGuard)
@@ -138,3 +136,4 @@ export class TokensController {
   async getBadgeMetadata(@Param('tokenId') tokenId: string) {
     return this.tokensService.getBadgeMetadata(tokenId);
   }
+}

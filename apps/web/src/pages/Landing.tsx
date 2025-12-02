@@ -1,13 +1,61 @@
 import { motion } from 'framer-motion';
-import { Ghost, Sparkles, Zap } from 'lucide-react';
+import { Ghost, Sparkles, Zap, Wallet } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from '../contexts/AuthContext';
+import { web3Manager } from '../utils/web3';
 import AnimatedBackground from '../components/AnimatedBackground';
 import GlowButton from '../components/GlowButton';
 import FloatingGhost from '../components/FloatingGhost';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 import { soundManager } from '../utils/soundManager';
 
 export default function Landing() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
+  const { isAuthenticated, login } = useAuth();
+  const [isConnecting, setIsConnecting] = useState(false);
+
+  const handleConnectWallet = async () => {
+    soundManager.play('click');
+    setIsConnecting(true);
+
+    try {
+      // Connect wallet
+      const connection = await web3Manager.connectWallet();
+      
+      if (!connection) {
+        setIsConnecting(false);
+        return;
+      }
+
+      // Sign authentication message
+      const message = 'Welcome to HauntedAI! Sign this message to authenticate.';
+      const signature = await web3Manager.signMessage(connection.address, message);
+
+      if (!signature) {
+        alert('Signature required to authenticate');
+        setIsConnecting(false);
+        return;
+      }
+
+      // Login with backend
+      const success = await login(connection.address, signature, message);
+
+      if (success) {
+        soundManager.play('success');
+        navigate('/dashboard');
+      } else {
+        alert('Authentication failed. Please try again.');
+      }
+    } catch (error) {
+      console.error('Wallet connection error:', error);
+      alert('Failed to connect wallet. Please try again.');
+    } finally {
+      setIsConnecting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen relative overflow-hidden">
@@ -30,15 +78,27 @@ export default function Landing() {
           </span>
         </motion.div>
 
-        <motion.button
-          className="glass px-6 py-3 rounded-lg font-semibold hover:bg-[#FF6B00] hover:text-white transition-all duration-300"
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8 }}
-          whileHover={{ scale: 1.05 }}
-        >
-          Connect Wallet
-        </motion.button>
+        <div className="flex items-center gap-4">
+          <LanguageSwitcher />
+          
+          <motion.button
+            onClick={handleConnectWallet}
+            disabled={isConnecting || isAuthenticated}
+            className={`glass px-6 py-3 rounded-lg font-semibold transition-all duration-300 flex items-center gap-2 ${
+              isAuthenticated 
+                ? 'bg-green-500/20 text-green-400 cursor-default' 
+                : 'hover:bg-[#FF6B00] hover:text-white'
+            }`}
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+            whileHover={!isAuthenticated && !isConnecting ? { scale: 1.05 } : {}}
+            onMouseEnter={() => !isConnecting && soundManager.play('hover')}
+          >
+            <Wallet className="w-5 h-5" />
+            {isConnecting ? t('common.connecting') : isAuthenticated ? `✓ ${t('common.connected')}` : t('landing.connectWallet')}
+          </motion.button>
+        </div>
       </nav>
 
       <div className="min-h-screen flex flex-col items-center justify-center px-4">
@@ -59,7 +119,7 @@ export default function Landing() {
             }}
             transition={{ duration: 2, repeat: Infinity }}
           >
-            Welcome to HauntedAI
+            {t('landing.title')}
           </motion.h1>
 
           <motion.p
@@ -68,7 +128,7 @@ export default function Landing() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8 }}
           >
-            Where AI Agents Come Alive in the Darkness...
+            {t('landing.subtitle')}
           </motion.p>
 
           <motion.div
@@ -87,7 +147,7 @@ export default function Landing() {
               >
                 <div className="flex items-center gap-3">
                   <Sparkles className="w-6 h-6" />
-                  Enter the Haunted Room
+                  {t('landing.enterRoom')}
                 </div>
               </GlowButton>
             </div>
@@ -102,7 +162,7 @@ export default function Landing() {
               >
                 <div className="flex items-center gap-3">
                   <Zap className="w-6 h-6" />
-                  View Gallery
+                  {t('landing.viewGallery')}
                 </div>
               </GlowButton>
             </div>
@@ -115,9 +175,9 @@ export default function Landing() {
             transition={{ delay: 1.5 }}
           >
             {[
-              { title: 'AI Agents', desc: 'Intelligent haunting spirits', icon: '👻' },
-              { title: 'Real-Time Magic', desc: 'Watch creations come alive', icon: '✨' },
-              { title: 'IPFS Storage', desc: 'Eternal preservation', icon: '🔮' },
+              { title: t('landing.features.agents.title'), desc: t('landing.features.agents.desc'), icon: '👻' },
+              { title: t('landing.features.realtime.title'), desc: t('landing.features.realtime.desc'), icon: '✨' },
+              { title: t('landing.features.storage.title'), desc: t('landing.features.storage.desc'), icon: '🔮' },
             ].map((feature, idx) => (
               <motion.div
                 key={idx}

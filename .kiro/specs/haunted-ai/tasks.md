@@ -409,35 +409,35 @@
   - **Property 63: Badge metadata display**
   - **Validates: Requirements 16.4, 16.5**
 
-- [-] 13. i already. created ui. just reivew it and be sut. intgeration work well and all date reall Frontend - Next.js Application
-- [-] 13.1 i already created ui for front end just. review all screen Initialize Next.js project
+- [x] 13. i already. created ui. just reivew it and be sut. intgeration work well and all date reall Frontend - Next.js Application
+- [x] 13.1 i already created ui for front end just. review all screen Initialize Next.js project
   - Create Next.js 14 app in apps/web
   - Install TailwindCSS and configure dark theme
   - Set up app router structure
   - Configure environment variables
   - _Requirements: 6.1_
 
-- [ ] 13.2 update my ui landing page (/) to be. sure it works nomal and with professional integration 
+- [x] 13.2 update my ui landing page (/) to be. sure it works nomal and with professional integration 
   - Design hero section with spooky theme
   - Add Connect Wallet button
   - Implement fog overlay with CSS animations
   - Add feature showcase section
   - _Requirements: 6.1_
 
-- [ ] 13.3 Implement Web3 wallet connection
+- [x] 13.3 Implement Web3 wallet connection
   - Install Wagmi and Viem
   - Create WalletConnect integration
   - Implement signature request for authentication
   - Store JWT in localStorage
   - _Requirements: 11.1, 11.2, 11.3_
 
-- [ ] 13.4 Write property test for authentication flow
+- [x] 13.4 Write property test for authentication flow
   - **Property 39: Wallet connection triggers signature request**
   - **Property 40: Valid signature issues JWT**
   - **Property 41: JWT storage and usage**
   - **Validates: Requirements 11.1, 11.2, 11.3**
 
-- [ ] 13.5 i already. have ui for  dashboard page (/app)
+- [x] 13.5 i already. have ui for  dashboard page (/app)
   - Design sidebar with navigation
   - Create agent status cards
   - Display recent rooms list
@@ -445,21 +445,21 @@
   - Add "Create New Session" button
   - _Requirements: 8.1_
 
-- [ ] 13.6 Create live room page (/room/[id])
+- [x] 13.6 Create live room page (/room/[id])
   - Design input panel for user prompt
   - Create preview panel for generated content
   - Add live logs terminal component
   - Implement SSE connection for real-time logs
   - _Requirements: 5.1, 5.2_
 
-- [ ] 13.7 Write property test for live logs display
+- [x] 13.7 Write property test for live logs display
   - **Property 16: Log message rendering completeness**
   - **Property 17: Error log formatting**
   - **Property 18: Success log formatting**
   - **Property 19: Log buffer size limit**
   - **Validates: Requirements 5.2, 5.3, 5.4, 5.5**
 
-- [ ] 13.8 Implement Three.js spooky visualization
+- [x] 13.8 Implement Three.js spooky visualization
   - Install Three.js and React Three Fiber
   - Create 3D scene with fog effect
   - Add animated ghost sprites for each agent
@@ -467,25 +467,25 @@
   - Add camera movement on mouse hover
   - _Requirements: 13.1, 13.2, 13.3, 13.4, 13.5_
 
-- [ ] 13.9 Write property test for Three.js interactions
+- [x] 13.9 Write property test for Three.js interactions
   - **Property 49: Agent operation displays ghost sprite**
   - **Property 50: Success triggers particle animation**
   - **Property 51: Error triggers red glow and thunder**
   - **Property 52: Mouse movement affects camera**
   - **Validates: Requirements 13.2, 13.3, 13.4, 13.5**
 
-- [ ] 13.10 Add spooky sound effects with Howler.js
+- [x] 13.10 Add spooky sound effects with Howler.js
   - Install Howler.js
   - Add sound files (whisper, ghost laugh, thunder)
   - Play sounds on user interactions
   - Play sounds on operation success/failure
   - _Requirements: 6.2_
 
-- [ ] 13.11 Write property test for sound effects
+- [x] 13.11 Write property test for sound effects
   - **Property 20: Interaction triggers sound**
   - **Validates: Requirements 6.2**
 
-- [ ] 13.12 Create explore page (/explore)
+- [x] 13.12 Create explore page (/explore)
   - Design content grid with pagination
   - Add filter bar (by agent type, date)
   - Implement search functionality
@@ -493,13 +493,13 @@
   - Add CID copy and download buttons
   - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5_
 
-- [ ] 13.13 Write property test for explore page
+- [x] 13.13 Write property test for explore page
   - **Property 35: Filter correctness**
   - **Property 37: Clipboard copy operation**
   - **Property 38: Image download functionality**
   - **Validates: Requirements 10.2, 10.4, 10.5**
 
-- [ ] 13.14 Implement multi-language support
+- [x] 13.14 Implement multi-language support
   - Install next-intl or react-i18next
   - Create translation files (en, ar)
   - Detect browser language
@@ -507,7 +507,7 @@
   - Implement RTL support for Arabic
   - _Requirements: 20.1, 20.2, 20.4_
 
-- [ ] 13.15 Write property test for multi-language
+- [x] 13.15 Write property test for multi-language
   - **Property 77: Language detection**
   - **Property 78: Language switching without reload**
   - **Property 80: RTL text rendering**

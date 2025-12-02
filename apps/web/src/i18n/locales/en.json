@@ -1,0 +1,98 @@
+{
+  "landing": {
+    "title": "Welcome to HauntedAI",
+    "subtitle": "Where AI Agents Come Alive in the Darkness...",
+    "connectWallet": "Connect Wallet",
+    "enterRoom": "Enter the Haunted Room",
+    "viewGallery": "View Gallery",
+    "features": {
+      "agents": {
+        "title": "AI Agents",
+        "desc": "Intelligent haunting spirits"
+      },
+      "realtime": {
+        "title": "Real-Time Magic",
+        "desc": "Watch creations come alive"
+      },
+      "storage": {
+        "title": "IPFS Storage",
+        "desc": "Eternal preservation"
+      }
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Manage your haunted AI agents",
+    "newSession": "New Session",
+    "recentRooms": "Recent Rooms",
+    "walletBalance": "Token Balance",
+    "logout": "Logout",
+    "noRooms": "No rooms yet. Create your first haunted session!",
+    "loading": "Loading...",
+    "agents": {
+      "story": "Story Agent",
+      "asset": "Asset Agent",
+      "code": "Code Agent",
+      "deploy": "Deploy Agent",
+      "storyDesc": "Generates spooky stories",
+      "assetDesc": "Creates haunting images",
+      "codeDesc": "Builds mini-games",
+      "deployDesc": "Deploys to IPFS"
+    },
+    "modal": {
+      "title": "New Session",
+      "placeholder": "A haunted castle with mysterious whispers...",
+      "label": "Enter your haunted idea",
+      "summon": "Summon Agents",
+      "creating": "Creating..."
+    }
+  },
+  "liveRoom": {
+    "title": "Live Room",
+    "roomId": "Room ID",
+    "status": {
+      "idle": "idle",
+      "running": "running",
+      "done": "done",
+      "error": "error"
+    },
+    "input": "Input",
+    "startWorkflow": "Start Workflow",
+    "starting": "Starting...",
+    "liveLogs": "Live Logs",
+    "assets": "Assets",
+    "noAssets": "No assets generated yet. Start the workflow to create content.",
+    "noLogs": "Waiting for logs... Start the workflow to see agent activity.",
+    "copy": "Copy",
+    "copied": "CID copied to clipboard!",
+    "close": "Close"
+  },
+  "explore": {
+    "title": "Haunted Gallery",
+    "subtitle": "Explore creations from the darkness",
+    "search": "Search haunted creations...",
+    "filters": "Filters",
+    "filterAll": "All Types",
+    "filterStory": "Story",
+    "filterAsset": "Image",
+    "filterCode": "Code",
+    "filterDeploy": "Deploy",
+    "noAssets": "No assets found. Create some haunted content to see it here!",
+    "loading": "Loading assets...",
+    "viewOnIpfs": "View on IPFS",
+    "metadata": "Metadata",
+    "size": "Size",
+    "roomId": "Room ID",
+    "ipfsCid": "IPFS CID"
+  },
+  "common": {
+    "connecting": "Connecting...",
+    "connected": "Connected",
+    "active": "active",
+    "view": "View",
+    "copy": "Copy",
+    "close": "Close",
+    "search": "Search",
+    "filter": "Filter"
+  }
+}
