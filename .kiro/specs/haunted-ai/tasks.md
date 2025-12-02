@@ -365,7 +365,7 @@
   - Test access control
   - _Requirements: 9.1, 16.1_
 
-- [ ] 11.6 Deploy contracts to bnb testnet
+- [-] 11.6 Deploy contracts to bnb testnet
   - Deploy HHCWToken, GhostBadge, Treasury
   - Verify contracts on bnbscan
   - Save contract addresses to environment variables
