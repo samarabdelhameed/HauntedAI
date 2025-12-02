@@ -91,9 +91,18 @@ forge script script/Deploy.s.sol --rpc-url amoy --broadcast --verify
 
 ## Contract Addresses
 
-After deployment, contract addresses will be saved in:
-- `broadcast/Deploy.s.sol/<chain-id>/run-latest.json`
-- Update `.env` file with deployed addresses
+### BSC Testnet (Deployed - December 2, 2024) ✅
+
+| Contract | Address |
+|----------|---------|
+| **HHCWToken** | `0x310Ee8C7c6c8669c93B5b73350e288825cd114e3` |
+| **Treasury** | `0xdAFEE25F98Ff62504C1086eAcbb406190F3110D5` |
+
+**Status**: ✅ Deployed and tested with real transactions  
+**Test Report**: See `REAL_TEST_REPORT_AR.md` for complete test results  
+**BSCScan**: https://testnet.bscscan.com/address/0x310Ee8C7c6c8669c93B5b73350e288825cd114e3
+
+After deployment, addresses are saved in `.env` file
 
 ## Network Configuration
 

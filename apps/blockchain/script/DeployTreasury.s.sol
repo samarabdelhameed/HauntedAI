@@ -17,7 +17,15 @@ import "../src/GhostBadge.sol";
 contract DeployTreasury is Script {
     function run() external {
         // Get deployer private key from environment
-        uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
+        // Try with 0x prefix first, fallback to without prefix
+        uint256 deployerPrivateKey;
+        try vm.envUint("PRIVATE_KEY") returns (uint256 key) {
+            deployerPrivateKey = key;
+        } catch {
+            // If PRIVATE_KEY doesn't have 0x prefix, try adding it
+            string memory pkHex = vm.envString("PRIVATE_KEY");
+            deployerPrivateKey = vm.parseUint(string.concat("0x", pkHex));
+        }
         
         // Get existing contract addresses from environment (if deploying to existing system)
         address tokenAddress = vm.envOr("HHCW_TOKEN_ADDRESS", address(0));
@@ -70,14 +78,9 @@ contract DeployTreasury is Script {
         console.log("Treasury:", address(treasury));
         console.log("========================\n");
         
-        // Save addresses to file for easy reference
-        string memory addresses = string(abi.encodePacked(
-            "HHCW_TOKEN_ADDRESS=", vm.toString(tokenAddress), "\n",
-            "GHOST_BADGE_ADDRESS=", vm.toString(badgeAddress), "\n",
-            "TREASURY_ADDRESS=", vm.toString(address(treasury)), "\n"
-        ));
-        
-        vm.writeFile("deployment-addresses.txt", addresses);
-        console.log("Addresses saved to deployment-addresses.txt");
+        console.log("\n=== Add to .env ===");
+        console.log("HHCW_TOKEN_ADDRESS=", vm.toString(tokenAddress));
+        console.log("GHOST_BADGE_ADDRESS=", vm.toString(badgeAddress));
+        console.log("TREASURY_ADDRESS=", vm.toString(address(treasury)));
     }
 }

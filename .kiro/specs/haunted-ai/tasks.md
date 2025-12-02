@@ -358,7 +358,7 @@
   - Add grantBadge function
   - _Requirements: 9.1, 9.2, 9.3, 16.1_
 
-- [ ] 11.5 Write unit tests for smart contracts
+- [x] 11.5 Write unit tests for smart contracts
   - Test token minting and burning
   - Test badge minting
   - Test reward distribution
