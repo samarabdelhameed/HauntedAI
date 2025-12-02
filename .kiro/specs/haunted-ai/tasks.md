@@ -256,21 +256,21 @@
   - **Property 4: Story generation retry with backoff** (same pattern)
   - **Validates: Requirements 2.4**
 
-- [ ] 8. CodeAgent Service
-- [ ] 8.1 Create CodeAgent micro-service
+- [-] 8. CodeAgent Service
+- [x] 8.1 Create CodeAgent micro-service
   - Initialize Node.js service with Express
   - Install OpenAI SDK (for Codex)
   - Create POST /generate endpoint
   - Implement health check endpoint
   - _Requirements: 3.1_
 
-- [ ] 8.2 Implement code generation with OpenAI Codex
+- [x] 8.2 Implement code generation with OpenAI Codex
   - Generate code prompt from story and image theme
   - Call OpenAI API to generate mini-game HTML/JS code
   - Parse and validate generated code
   - _Requirements: 3.1_
 
-- [ ] 8.3 Write property test for code generation trigger
+- [x] 8.3 Write property test for code generation trigger
   - **Property 9: Image completion triggers code generation**
   - **Validates: Requirements 3.1**
 
