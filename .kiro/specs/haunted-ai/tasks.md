@@ -274,27 +274,27 @@
   - **Property 9: Image completion triggers code generation**
   - **Validates: Requirements 3.1**
 
-- [ ] 8.4 Implement automated testing for generated code
+- [x] 8.4 Implement automated testing for generated code
   - Run ESLint on generated code
   - Execute basic syntax validation
   - Check for security issues (no eval, no inline scripts)
   - _Requirements: 3.2_
 
-- [ ] 8.5 Write property test for code testing
+- [x] 8.5 Write property test for code testing
   - **Property 10: Generated code is tested**
   - **Validates: Requirements 3.2**
 
-- [ ] 8.6 Implement auto-patching for failed tests
+- [x] 8.6 Implement auto-patching for failed tests
   - If tests fail, generate patch using OpenAI
   - Apply patch and re-run tests
   - Retry up to 3 times
   - _Requirements: 3.3_
 
-- [ ] 8.7 Write property test for auto-patching
+- [x] 8.7 Write property test for auto-patching
   - **Property 11: Code storage round-trip**
   - **Validates: Requirements 3.4**
 
-- [ ] 8.8 Integrate code upload to Storacha
+- [x] 8.8 Integrate code upload to Storacha
   - Upload passing code to Storacha
   - Return CID in response
   - Save code metadata to database
