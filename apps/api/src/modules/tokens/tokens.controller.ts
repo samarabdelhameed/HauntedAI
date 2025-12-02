@@ -71,4 +71,70 @@ export class TokensController {
   ) {
     return this.tokensService.rewardUser(rewardDto.userId, rewardDto.amount, rewardDto.reason, rewardDto.txHash);
   }
+
+  @Post('tokens/reward-upload')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Reward user for uploading content (10 HHCW)' })
+  @ApiResponse({ status: 200, description: 'Upload reward distributed' })
+  async rewardUpload(@Body() body: { userId: string }) {
+    return this.tokensService.rewardUpload(body.userId);
+  }
+
+  @Post('tokens/reward-view')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Reward user for viewing content (1 HHCW)' })
+  @ApiResponse({ status: 200, description: 'View reward distributed' })
+  async rewardView(@Body() body: { userId: string }) {
+    return this.tokensService.rewardView(body.userId);
+  }
+
+  @Post('tokens/reward-referral')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Reward user for successful referral (50 HHCW)' })
+  @ApiResponse({ status: 200, description: 'Referral reward distributed' })
+  async rewardReferral(@Body() body: { userId: string }) {
+    return this.tokensService.rewardReferral(body.userId);
+  }
 }
+
+
+  @Post('tokens/check-badges')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Check user achievements and grant badges' })
+  @ApiResponse({ status: 200, description: 'Badges checked and granted' })
+  async checkBadges(@Body() body: { userId: string }) {
+    return this.tokensService.checkAndGrantBadges(body.userId);
+  }
+
+  @Post('tokens/grant-badge')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Grant a specific badge to a user' })
+  @ApiResponse({ status: 200, description: 'Badge granted' })
+  async grantBadge(@Body() body: { userId: string; badgeType: string }) {
+    return this.tokensService.grantBadge(body.userId, body.badgeType);
+  }
+
+  @Get('users/:userId/badges')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get all badges owned by a user' })
+  @ApiParam({ name: 'userId', description: 'User ID' })
+  @ApiResponse({ status: 200, description: 'User badges' })
+  async getUserBadges(@Param('userId') userId: string) {
+    return this.tokensService.getUserBadges(userId);
+  }
+
+  @Get('badges/:tokenId')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get badge metadata' })
+  @ApiParam({ name: 'tokenId', description: 'Badge token ID' })
+  @ApiResponse({ status: 200, description: 'Badge metadata' })
+  async getBadgeMetadata(@Param('tokenId') tokenId: string) {
+    return this.tokensService.getBadgeMetadata(tokenId);
+  }

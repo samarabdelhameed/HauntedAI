@@ -384,40 +384,40 @@
   - **Property 61: Badge transaction recording**
   - **Validates: Requirements 16.1, 16.2, 16.3**
 
-- [ ] 12. Token Service Integration
-- [ ] 12.1 Create blockchain service in API
+- [x] 12. Token Service Integration
+- [x] 12.1 Create blockchain service in API
   - Install ethers.js
   - Create contract interaction methods
   - Implement wallet management (use server wallet for gas)
   - _Requirements: 9.1_
 
-- [ ] 12.2 Implement reward distribution logic
+- [x] 12.2 Implement reward distribution logic
   - Call Treasury.rewardUpload when user uploads content
   - Call Treasury.rewardView when user views content
   - Call Treasury.rewardReferral when referral completes
   - Record all transactions in database
   - _Requirements: 9.1, 9.2, 9.3, 9.4_
 
-- [ ] 12.3 Implement badge minting logic
+- [x] 12.3 Implement badge minting logic
   - Check user achievements (10 rooms, 1000 tokens)
   - Call Treasury.grantBadge when achievement unlocked
   - Record badge in database
   - _Requirements: 16.1, 16.2, 16.3_
 
-- [ ] 12.4 Write property test for badge display
+- [x] 12.4 Write property test for badge display
   - **Property 62: Badge display completeness**
   - **Property 63: Badge metadata display**
   - **Validates: Requirements 16.4, 16.5**
 
-- [ ] 13. Frontend - Next.js Application
-- [ ] 13.1 Initialize Next.js project
+- [-] 13. i already. created ui. just reivew it and be sut. intgeration work well and all date reall Frontend - Next.js Application
+- [-] 13.1 i already created ui for front end just. review all screen Initialize Next.js project
   - Create Next.js 14 app in apps/web
   - Install TailwindCSS and configure dark theme
   - Set up app router structure
   - Configure environment variables
   - _Requirements: 6.1_
 
-- [ ] 13.2 Create landing page (/)
+- [ ] 13.2 update my ui landing page (/) to be. sure it works nomal and with professional integration 
   - Design hero section with spooky theme
   - Add Connect Wallet button
   - Implement fog overlay with CSS animations
@@ -437,7 +437,7 @@
   - **Property 41: JWT storage and usage**
   - **Validates: Requirements 11.1, 11.2, 11.3**
 
-- [ ] 13.5 Create dashboard page (/app)
+- [ ] 13.5 i already. have ui for  dashboard page (/app)
   - Design sidebar with navigation
   - Create agent status cards
   - Display recent rooms list

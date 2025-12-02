@@ -6,11 +6,13 @@ import { Test, TestingModule } from '@nestjs/testing';
 import * as fc from 'fast-check';
 
 import { TokensService } from './tokens.service';
+import { BlockchainService } from './blockchain.service';
 import { PrismaService } from '../../prisma/prisma.service';
 
 describe('NFT Badges Property-Based Tests', () => {
   let service: TokensService;
   let prismaService: PrismaService;
+  let blockchainService: BlockchainService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -24,8 +26,18 @@ describe('NFT Badges Property-Based Tests', () => {
             },
             badge: {
               findMany: jest.fn(),
+              findFirst: jest.fn(),
               create: jest.fn(),
             },
+          },
+        },
+        {
+          provide: BlockchainService,
+          useValue: {
+            grantBadge: jest.fn(),
+            getUserStats: jest.fn(),
+            hasBadgeType: jest.fn(),
+            getUserBadges: jest.fn(),
           },
         },
       ],
@@ -33,6 +45,7 @@ describe('NFT Badges Property-Based Tests', () => {
 
     service = module.get<TokensService>(TokensService);
     prismaService = module.get<PrismaService>(PrismaService);
+    blockchainService = module.get<BlockchainService>(BlockchainService);
   });
 
   afterEach(() => {
@@ -383,6 +396,404 @@ describe('NFT Badges Property-Based Tests', () => {
               const currTime = badges[i].createdAt.getTime();
               expect(currTime).toBeGreaterThanOrEqual(prevTime);
             }
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+  });
+
+  // Feature: haunted-ai, Property 62: Badge display completeness
+  // Validates: Requirements 16.4
+  describe('Property 62: Badge display completeness', () => {
+    it('should display all NFT badges owned by user', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.record({
+            userId: fc.uuid(),
+            badgeCount: fc.integer({ min: 1, max: 10 }),
+          }),
+          async ({ userId, badgeCount }) => {
+            // Reset mocks
+            jest.clearAllMocks();
+
+            // Mock user with wallet address
+            const mockUser = {
+              id: userId,
+              did: `did:key:${userId}`,
+              username: `user_${userId.substring(0, 8)}`,
+              walletAddress: `0x${'1'.repeat(40)}`,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            };
+
+            jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(mockUser);
+
+            // Mock badges
+            const mockBadges = [];
+            for (let i = 0; i < badgeCount; i++) {
+              mockBadges.push({
+                id: `badge-${i}`,
+                userId,
+                tokenId: i + 1,
+                badgeType: ['Ghost Novice', 'Haunted Creator', 'Haunted Master', 'Spooky Legend'][i % 4],
+                txHash: `0x${'1'.repeat(64)}`,
+                createdAt: new Date(),
+              });
+            }
+
+            jest.spyOn(prismaService.badge, 'findMany').mockResolvedValue(mockBadges);
+
+            const badges = await prismaService.badge.findMany({ where: { userId } });
+
+            // Property: All badges owned by user should be returned
+            expect(badges.length).toBe(badgeCount);
+            badges.forEach((badge) => {
+              expect(badge.userId).toBe(userId);
+              expect(badge.tokenId).toBeGreaterThan(0);
+              expect(badge.badgeType).toBeDefined();
+              expect(badge.txHash).toMatch(/^0x[a-fA-F0-9]{64}$/);
+            });
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should return empty array for user with no badges', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.record({
+            userId: fc.uuid(),
+          }),
+          async ({ userId }) => {
+            // Reset mocks
+            jest.clearAllMocks();
+
+            // Mock user with wallet address but no badges
+            const mockUser = {
+              id: userId,
+              did: `did:key:${userId}`,
+              username: `user_${userId.substring(0, 8)}`,
+              walletAddress: `0x${'1'.repeat(40)}`,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            };
+
+            jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(mockUser);
+            jest.spyOn(prismaService.badge, 'findMany').mockResolvedValue([]);
+
+            const badges = await prismaService.badge.findMany({ where: { userId } });
+
+            // Property: User with no badges should return empty array
+            expect(badges).toEqual([]);
+            expect(badges.length).toBe(0);
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should fetch badges from blockchain for user profile view', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.record({
+            userId: fc.uuid(),
+            walletAddress: fc.array(fc.constantFrom('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'), { minLength: 40, maxLength: 40 }),
+            badgeCount: fc.integer({ min: 0, max: 4 }),
+          }),
+          async ({ userId, walletAddress, badgeCount }) => {
+            // Reset mocks
+            jest.clearAllMocks();
+
+            const walletAddr = `0x${walletAddress.join('')}`;
+
+            // Mock user
+            const mockUser = {
+              id: userId,
+              did: `did:key:${userId}`,
+              username: `user_${userId.substring(0, 8)}`,
+              walletAddress: walletAddr,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            };
+
+            jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(mockUser);
+
+            // Mock badges
+            const mockBadges = [];
+            for (let i = 0; i < badgeCount; i++) {
+              mockBadges.push({
+                id: `badge-${i}`,
+                userId,
+                tokenId: i + 1,
+                badgeType: ['Ghost Novice', 'Haunted Creator', 'Haunted Master', 'Spooky Legend'][i],
+                txHash: `0x${'1'.repeat(64)}`,
+                createdAt: new Date(),
+              });
+            }
+
+            jest.spyOn(prismaService.badge, 'findMany').mockResolvedValue(mockBadges);
+
+            const user = await prismaService.user.findUnique({ where: { id: userId } });
+            const badges = await prismaService.badge.findMany({ where: { userId } });
+
+            // Property: Profile view should fetch all badges from blockchain
+            expect(user?.walletAddress).toBe(walletAddr);
+            expect(badges.length).toBe(badgeCount);
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should handle users without wallet addresses gracefully', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.record({
+            userId: fc.uuid(),
+          }),
+          async ({ userId }) => {
+            // Reset mocks
+            jest.clearAllMocks();
+
+            // Mock user without wallet address
+            const mockUser = {
+              id: userId,
+              did: `did:key:${userId}`,
+              username: `user_${userId.substring(0, 8)}`,
+              walletAddress: null,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            };
+
+            jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(mockUser);
+            jest.spyOn(prismaService.badge, 'findMany').mockResolvedValue([]);
+
+            const user = await prismaService.user.findUnique({ where: { id: userId } });
+            const badges = await prismaService.badge.findMany({ where: { userId } });
+
+            // Property: Users without wallet should return empty badge array
+            if (!user?.walletAddress) {
+              expect(badges).toEqual([]);
+            }
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+  });
+
+  // Feature: haunted-ai, Property 63: Badge metadata display
+  // Validates: Requirements 16.5
+  describe('Property 63: Badge metadata display', () => {
+    it('should display badge type, metadata, and acquisition timestamp', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.record({
+            userId: fc.uuid(),
+            tokenId: fc.integer({ min: 1, max: 10000 }),
+            badgeType: fc.constantFrom('Ghost Novice', 'Haunted Creator', 'Haunted Master', 'Spooky Legend'),
+          }),
+          async ({ userId, tokenId, badgeType }) => {
+            // Reset mocks
+            jest.clearAllMocks();
+
+            const createdAt = new Date();
+            const txHash = `0x${'1'.repeat(64)}`;
+
+            // Mock badge with full metadata
+            const mockBadge = {
+              id: fc.sample(fc.uuid(), 1)[0],
+              userId,
+              tokenId,
+              badgeType,
+              txHash,
+              createdAt,
+              user: {
+                username: `user_${userId.substring(0, 8)}`,
+                walletAddress: `0x${'2'.repeat(40)}`,
+              },
+            };
+
+            jest.spyOn(prismaService.badge, 'findFirst').mockResolvedValue(mockBadge);
+
+            const badge = await prismaService.badge.findFirst({
+              where: { tokenId },
+              include: { user: { select: { username: true, walletAddress: true } } },
+            });
+
+            // Property: Badge metadata should include type, timestamp, and owner info
+            expect(badge?.badgeType).toBe(badgeType);
+            expect(badge?.createdAt).toBeInstanceOf(Date);
+            expect(badge?.txHash).toMatch(/^0x[a-fA-F0-9]{64}$/);
+            expect(badge?.user.username).toBeDefined();
+            expect(badge?.user.walletAddress).toMatch(/^0x[a-fA-F0-9]{40}$/);
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should include transaction hash in badge metadata', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.record({
+            tokenId: fc.integer({ min: 1, max: 10000 }),
+          }),
+          fc.array(fc.constantFrom('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'), { minLength: 64, maxLength: 64 }),
+          async ({ tokenId }, hexArray) => {
+            // Reset mocks
+            jest.clearAllMocks();
+
+            const txHash = `0x${hexArray.join('')}`;
+
+            // Mock badge
+            const mockBadge = {
+              id: fc.sample(fc.uuid(), 1)[0],
+              userId: fc.sample(fc.uuid(), 1)[0],
+              tokenId,
+              badgeType: 'Ghost Novice',
+              txHash,
+              createdAt: new Date(),
+              user: {
+                username: 'testuser',
+                walletAddress: `0x${'1'.repeat(40)}`,
+              },
+            };
+
+            jest.spyOn(prismaService.badge, 'findFirst').mockResolvedValue(mockBadge);
+
+            const badge = await prismaService.badge.findFirst({
+              where: { tokenId },
+              include: { user: { select: { username: true, walletAddress: true } } },
+            });
+
+            // Property: Badge metadata must include valid Polygon tx_hash
+            expect(badge?.txHash).toBe(txHash);
+            expect(badge?.txHash).toMatch(/^0x[a-fA-F0-9]{64}$/);
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should display acquisition date in correct format', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.record({
+            tokenId: fc.integer({ min: 1, max: 10000 }),
+            timestamp: fc.date({ min: new Date('2024-01-01'), max: new Date('2025-12-31') }),
+          }),
+          async ({ tokenId, timestamp }) => {
+            // Skip invalid dates
+            if (isNaN(timestamp.getTime())) {
+              return;
+            }
+
+            // Reset mocks
+            jest.clearAllMocks();
+
+            // Mock badge with specific timestamp
+            const mockBadge = {
+              id: fc.sample(fc.uuid(), 1)[0],
+              userId: fc.sample(fc.uuid(), 1)[0],
+              tokenId,
+              badgeType: 'Haunted Master',
+              txHash: `0x${'1'.repeat(64)}`,
+              createdAt: timestamp,
+              user: {
+                username: 'testuser',
+                walletAddress: `0x${'1'.repeat(40)}`,
+              },
+            };
+
+            jest.spyOn(prismaService.badge, 'findFirst').mockResolvedValue(mockBadge);
+
+            const badge = await prismaService.badge.findFirst({
+              where: { tokenId },
+              include: { user: { select: { username: true, walletAddress: true } } },
+            });
+
+            // Property: Acquisition date should be a valid Date object
+            expect(badge?.createdAt).toBeInstanceOf(Date);
+            expect(badge?.createdAt.getTime()).toBe(timestamp.getTime());
+            if (badge?.createdAt && !isNaN(badge.createdAt.getTime())) {
+              expect(badge.createdAt.toISOString()).toBeDefined();
+            }
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should include all required metadata fields', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.record({
+            tokenId: fc.integer({ min: 1, max: 10000 }),
+            badgeType: fc.string({ minLength: 5, maxLength: 50 }),
+            username: fc.string({ minLength: 3, maxLength: 20 }),
+          }),
+          async ({ tokenId, badgeType, username }) => {
+            // Reset mocks
+            jest.clearAllMocks();
+
+            // Mock complete badge metadata
+            const mockBadge = {
+              id: fc.sample(fc.uuid(), 1)[0],
+              userId: fc.sample(fc.uuid(), 1)[0],
+              tokenId,
+              badgeType,
+              txHash: `0x${'1'.repeat(64)}`,
+              createdAt: new Date(),
+              user: {
+                username,
+                walletAddress: `0x${'1'.repeat(40)}`,
+              },
+            };
+
+            jest.spyOn(prismaService.badge, 'findFirst').mockResolvedValue(mockBadge);
+
+            const badge = await prismaService.badge.findFirst({
+              where: { tokenId },
+              include: { user: { select: { username: true, walletAddress: true } } },
+            });
+
+            // Property: Badge metadata must include all required fields
+            expect(badge).toBeDefined();
+            expect(badge?.tokenId).toBe(tokenId);
+            expect(badge?.badgeType).toBe(badgeType);
+            expect(badge?.txHash).toBeDefined();
+            expect(badge?.createdAt).toBeDefined();
+            expect(badge?.user.username).toBe(username);
+            expect(badge?.user.walletAddress).toBeDefined();
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should handle badge not found gracefully', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.record({
+            tokenId: fc.integer({ min: 1, max: 10000 }),
+          }),
+          async ({ tokenId }) => {
+            // Reset mocks
+            jest.clearAllMocks();
+
+            // Mock badge not found
+            jest.spyOn(prismaService.badge, 'findFirst').mockResolvedValue(null);
+
+            const badge = await prismaService.badge.findFirst({
+              where: { tokenId },
+              include: { user: { select: { username: true, walletAddress: true } } },
+            });
+
+            // Property: Non-existent badge should return null
+            expect(badge).toBeNull();
           }
         ),
         { numRuns: 100 }

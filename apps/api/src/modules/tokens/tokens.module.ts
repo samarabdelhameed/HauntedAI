@@ -3,10 +3,11 @@ import { Module } from '@nestjs/common';
 
 import { TokensController } from './tokens.controller';
 import { TokensService } from './tokens.service';
+import { BlockchainService } from './blockchain.service';
 
 @Module({
   controllers: [TokensController],
-  providers: [TokensService],
-  exports: [TokensService],
+  providers: [TokensService, BlockchainService],
+  exports: [TokensService, BlockchainService],
 })
 export class TokensModule {}
