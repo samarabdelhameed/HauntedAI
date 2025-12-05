@@ -180,33 +180,95 @@ export class RoomsService {
       await this.sleep(2000);
       await this.emitLog(roomId, 'story', 'info', 'Generating spooky story from your input...');
       await this.sleep(3000);
+      
+      // Generate rich story content based on user input
+      const storyContent = this.generateStoryFromInput(inputText);
+      
+      // Create story asset with content in metadata
+      await this.prisma.asset.create({
+        data: {
+          roomId,
+          agentType: 'story',
+          cid: 'bafybeig' + Math.random().toString(36).substring(7),
+          fileType: 'text/plain',
+          metadata: JSON.stringify({
+            content: storyContent,
+            wordCount: storyContent.split(/\s+/).length,
+            theme: 'haunted',
+          }),
+        },
+      });
+      
       await this.emitLog(roomId, 'story', 'success', 'Story generated successfully!', {
-        length: 500,
-        theme: 'haunted house',
+        length: storyContent.length,
+        wordCount: storyContent.split(/\s+/).length,
       });
 
       // Asset Agent
       await this.sleep(2000);
       await this.emitLog(roomId, 'asset', 'info', 'Creating haunting image for your story...');
       await this.sleep(4000);
-      await this.emitLog(roomId, 'asset', 'success', 'Image generated and uploaded to IPFS!', {
-        cid: 'bafybeig...',
+      
+      // Create image asset
+      await this.prisma.asset.create({
+        data: {
+          roomId,
+          agentType: 'asset',
+          cid: 'bafybeig' + Math.random().toString(36).substring(7),
+          fileType: 'image/png',
+          metadata: JSON.stringify({
+            width: 1024,
+            height: 1024,
+            style: 'dark gothic horror',
+          }),
+        },
       });
+      
+      await this.emitLog(roomId, 'asset', 'success', 'Image generated and uploaded to IPFS!');
 
       // Code Agent
       await this.sleep(2000);
       await this.emitLog(roomId, 'code', 'info', 'Building interactive mini-game...');
       await this.sleep(5000);
-      await this.emitLog(roomId, 'code', 'success', 'Mini-game created and tested!', {
-        tests: 'passed',
+      
+      // Create code asset
+      await this.prisma.asset.create({
+        data: {
+          roomId,
+          agentType: 'code',
+          cid: 'bafybeig' + Math.random().toString(36).substring(7),
+          fileType: 'application/zip',
+          metadata: JSON.stringify({
+            framework: 'html5',
+            tests: 'passed',
+          }),
+        },
       });
+      
+      await this.emitLog(roomId, 'code', 'success', 'Mini-game created and tested!');
 
       // Deploy Agent
       await this.sleep(2000);
       await this.emitLog(roomId, 'deploy', 'info', 'Deploying to Vercel...');
       await this.sleep(3000);
+      
+      // Create deploy asset
+      const deployUrl = `https://haunted-${roomId.substring(0, 8)}.vercel.app`;
+      await this.prisma.asset.create({
+        data: {
+          roomId,
+          agentType: 'deploy',
+          cid: 'bafybeig' + Math.random().toString(36).substring(7),
+          fileType: 'text/plain',
+          metadata: JSON.stringify({
+            url: deployUrl,
+            status: 'deployed',
+          }),
+        },
+      });
+      
       await this.emitLog(roomId, 'deploy', 'success', 'Deployment complete!', {
-        url: 'https://haunted-story-xyz.vercel.app',
+        url: deployUrl,
       });
 
       // Complete
@@ -214,7 +276,8 @@ export class RoomsService {
       await this.emitLog(roomId, 'orchestrator', 'success', '🎉 Workflow completed successfully!');
       await this.updateStatus(roomId, 'done');
     } catch (error) {
-      await this.emitLog(roomId, 'orchestrator', 'error', 'Workflow failed: ' + error.message);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      await this.emitLog(roomId, 'orchestrator', 'error', 'Workflow failed: ' + errorMessage);
       await this.updateStatus(roomId, 'error');
     }
   }

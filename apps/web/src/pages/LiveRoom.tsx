@@ -183,9 +183,19 @@ export default function LiveRoom() {
       setIsLoadingStory(true);
       
       // First, check if story content is in metadata
-      if (storyAsset.metadata?.content) {
-        setStoryText(storyAsset.metadata.content);
-        return;
+      if (storyAsset.metadata) {
+        try {
+          const metadata = typeof storyAsset.metadata === 'string' 
+            ? JSON.parse(storyAsset.metadata) 
+            : storyAsset.metadata;
+          
+          if (metadata?.content) {
+            setStoryText(metadata.content);
+            return;
+          }
+        } catch (e) {
+          // If metadata parsing fails, continue to IPFS fetch
+        }
       }
 
       // If not in metadata, try to fetch from IPFS

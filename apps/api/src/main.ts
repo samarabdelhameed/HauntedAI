@@ -23,8 +23,8 @@ async function bootstrap() {
     origin: [
       'http://localhost:3000',
       'http://localhost:5173',
-      process.env.FRONTEND_URL
-    ].filter(Boolean),
+      process.env.FRONTEND_URL || '',
+    ].filter((url) => url.length > 0),
     credentials: true,
   });
 
