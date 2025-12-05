@@ -11,8 +11,9 @@
 To run the complete E2E integration tests, the following services must be running:
 
 ### Required Services
+
 1. **PostgreSQL Database** (port 5432)
-2. **Redis Cache** (port 6379) 
+2. **Redis Cache** (port 6379)
 3. **API Gateway** (port 3001)
 4. **StoryAgent** (port 3002)
 5. **AssetAgent** (port 3003)
@@ -21,6 +22,7 @@ To run the complete E2E integration tests, the following services must be runnin
 8. **Orchestrator Service**
 
 ### Required Environment Variables
+
 ```bash
 # API Keys (Required for agents)
 GROQ_API_KEY=your-groq-api-key-here
@@ -44,6 +46,7 @@ JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
 Based on the existing test files, the E2E tests cover:
 
 ### ✅ Implemented Test Cases
+
 1. **Service Health Checks** - Verify all services are running
 2. **Web3 Authentication Flow** - Wallet connection and JWT issuance
 3. **Room Creation** - Session management
@@ -56,6 +59,7 @@ Based on the existing test files, the E2E tests cover:
 10. **Storage Round-trip** - Storacha upload/retrieval
 
 ### 🔍 Test Scenarios Covered
+
 - **Complete Workflow**: input → story → image → code → deploy
 - **Error Recovery**: Agent retry logic with exponential backoff
 - **Real-time Updates**: Live log streaming via SSE
@@ -67,29 +71,32 @@ Based on the existing test files, the E2E tests cover:
 Since services are not currently running, here's what the tests would validate:
 
 ### Core Workflow Tests
-| Test Case | Expected Result | Validation |
-|-----------|----------------|------------|
-| Story Generation | ✅ PASS | Non-empty spooky story with valid CID |
-| Asset Generation | ✅ PASS | Image URL and Storacha CID |
-| Code Generation | ✅ PASS | HTML/JS mini-game with tests |
-| Deployment | ✅ PASS | Live deployment URL |
-| Token Rewards | ✅ PASS | 10 HHCW tokens for upload |
-| Badge Check | ✅ PASS | NFT badge for achievements |
+
+| Test Case        | Expected Result | Validation                            |
+| ---------------- | --------------- | ------------------------------------- |
+| Story Generation | ✅ PASS         | Non-empty spooky story with valid CID |
+| Asset Generation | ✅ PASS         | Image URL and Storacha CID            |
+| Code Generation  | ✅ PASS         | HTML/JS mini-game with tests          |
+| Deployment       | ✅ PASS         | Live deployment URL                   |
+| Token Rewards    | ✅ PASS         | 10 HHCW tokens for upload             |
+| Badge Check      | ✅ PASS         | NFT badge for achievements            |
 
 ### Integration Tests
-| Component | Expected Result | Validation |
-|-----------|----------------|------------|
-| Authentication | ✅ PASS | JWT token issued for valid signature |
-| Room Management | ✅ PASS | Room status transitions (idle→running→done) |
-| Live Logging | ✅ PASS | Real-time SSE log streaming |
-| Content Discovery | ✅ PASS | Public content grid with pagination |
-| CID Validation | ✅ PASS | All CIDs match pattern `^bafy[a-z0-9]+$` |
+
+| Component         | Expected Result | Validation                                  |
+| ----------------- | --------------- | ------------------------------------------- |
+| Authentication    | ✅ PASS         | JWT token issued for valid signature        |
+| Room Management   | ✅ PASS         | Room status transitions (idle→running→done) |
+| Live Logging      | ✅ PASS         | Real-time SSE log streaming                 |
+| Content Discovery | ✅ PASS         | Public content grid with pagination         |
+| CID Validation    | ✅ PASS         | All CIDs match pattern `^bafy[a-z0-9]+$`    |
 
 ## Performance Expectations
 
 Based on the test configuration:
+
 - **Story Generation**: < 60 seconds
-- **Image Generation**: < 120 seconds  
+- **Image Generation**: < 120 seconds
 - **Code Generation**: < 90 seconds
 - **Deployment**: < 180 seconds
 - **Total Workflow**: < 8 minutes
@@ -99,6 +106,7 @@ Based on the test configuration:
 To complete the E2E integration tests:
 
 1. **Start Infrastructure Services**:
+
    ```bash
    docker-compose up postgres redis -d
    ```
@@ -109,10 +117,11 @@ To complete the E2E integration tests:
    - Configure Storacha DID and proof
 
 3. **Start Application Services**:
+
    ```bash
    # Option 1: Docker Compose (recommended)
    docker-compose up -d
-   
+
    # Option 2: Local development
    ./start-all-services.sh
    ```
@@ -126,6 +135,7 @@ To complete the E2E integration tests:
 ## Conclusion
 
 The E2E integration test framework is **COMPLETE** and ready for execution. The tests comprehensively cover:
+
 - ✅ Complete user workflow (input → story → image → code → deploy)
 - ✅ All CID validation and retrievability
 - ✅ Token reward distribution
