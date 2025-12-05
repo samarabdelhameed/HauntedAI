@@ -164,7 +164,7 @@ class ApiClient {
 
   // Token endpoints
   async getBalance(did: string) {
-    return this.request(`/api/v1/tokens/balance/${did}`, {
+    return this.request(`/api/v1/users/${did}/balance`, {
       method: 'GET',
     });
   }

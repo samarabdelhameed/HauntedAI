@@ -29,7 +29,6 @@ import { CreateRoomDto } from './dto/create-room.dto';
 
 @ApiTags('rooms')
 @Controller('rooms')
-@UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class RoomsController {
   constructor(
@@ -38,6 +37,7 @@ export class RoomsController {
   ) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Create new room' })
   @ApiResponse({
     status: 201,
@@ -77,6 +77,7 @@ export class RoomsController {
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Get all rooms for authenticated user' })
   @ApiResponse({
     status: 200,
@@ -103,6 +104,7 @@ export class RoomsController {
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Get room details by ID' })
   @ApiParam({ name: 'id', description: 'Room UUID' })
   @ApiResponse({
@@ -128,6 +130,7 @@ export class RoomsController {
   }
 
   @Post(':id/start')
+  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Start agent workflow for room' })
   @ApiParam({ name: 'id', description: 'Room UUID' })
@@ -149,7 +152,7 @@ export class RoomsController {
   }
 
   @Get(':id/logs')
-  @UseGuards(JwtOrQueryAuthGuard) // Override class-level guard to accept query token
+  @UseGuards(JwtOrQueryAuthGuard)
   @ApiOperation({ summary: 'Stream live logs for room via Server-Sent Events' })
   @ApiParam({ name: 'id', description: 'Room UUID' })
   @ApiResponse({

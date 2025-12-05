@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Send, Copy, X, Terminal, Play, BookOpen } from 'lucide-react';
+import { Copy, X, Terminal, Play, BookOpen } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -63,22 +63,25 @@ export default function LiveRoom() {
     if (!id) return;
 
     try {
-      setIsLoading(true);
       const response = await apiClient.getRoom(id);
 
       if (response.error || !response.data) {
+        console.error('Room not found:', response.error);
         alert('Room not found');
         navigate('/dashboard');
         return;
       }
 
       setRoom(response.data);
+      setIsLoading(false);
 
-      // Load story if available
-      await loadStory(response.data);
+      // Load story if available (don't await to avoid blocking)
+      loadStory(response.data);
 
-      // Connect to SSE for live logs
-      connectSSE();
+      // Connect to SSE for live logs only once
+      if (!sseRef.current) {
+        connectSSE();
+      }
       
       // Stop refresh interval if room is done or error
       if (response.data?.status === 'done' || response.data?.status === 'error') {
@@ -89,15 +92,20 @@ export default function LiveRoom() {
       }
     } catch (error) {
       console.error('Failed to load room:', error);
-      alert('Failed to load room');
-      navigate('/dashboard');
-    } finally {
       setIsLoading(false);
+      alert('Failed to load room: ' + (error as Error).message);
+      navigate('/dashboard');
     }
   };
 
   const connectSSE = () => {
     if (!id) return;
+    
+    // Close existing connection if any
+    if (sseRef.current) {
+      sseRef.current.close();
+      sseRef.current = null;
+    }
 
     try {
       const eventSource = apiClient.createSSEConnection(
@@ -310,6 +318,17 @@ export default function LiveRoom() {
               />
               {room.status}
             </div>
+            <motion.button
+              onClick={() => {
+                soundManager.play('click');
+                alert('🔊 Sounds enabled! You should hear sounds on events now.');
+              }}
+              className="px-3 py-1 bg-purple-500/20 text-purple-400 rounded-full text-sm hover:bg-purple-500/40 transition-all"
+              whileHover={{ scale: 1.05 }}
+              title="Test sound"
+            >
+              🔊
+            </motion.button>
           </div>
 
           <motion.button
@@ -507,9 +526,81 @@ export default function LiveRoom() {
                             <Copy className="w-4 h-4" />
                           </motion.button>
                         </div>
-                        <div className="font-mono text-xs text-gray-500 break-all">
+                        {asset.agentType === 'asset' && asset.fileType === 'image/png' && (
+                          <div className="mb-2 rounded-lg overflow-hidden border border-[#FF6B00]/20">
+                            <div style={{
+                              width: '100%',
+                              height: '150px',
+                              background: 'linear-gradient(135deg, #1a0a0a 0%, #2a1a1a 50%, #1a0a0a 100%)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '48px'
+                            }}>
+                              🏚️👻🕯️
+                            </div>
+                          </div>
+                        )}
+                        <div className="font-mono text-xs text-gray-500 break-all mb-2">
                           {asset.cid}
                         </div>
+                        {asset.agentType === 'code' && (
+                          <motion.button
+                            onClick={() => {
+                              try {
+                                const metadata = typeof asset.metadata === 'string' 
+                                  ? JSON.parse(asset.metadata) 
+                                  : asset.metadata;
+                                
+                                if (metadata?.gameCode) {
+                                  // Open game in new window with data URL
+                                  const gameWindow = window.open('', '_blank');
+                                  if (gameWindow) {
+                                    gameWindow.document.write(metadata.gameCode);
+                                    gameWindow.document.close();
+                                  }
+                                } else {
+                                  // Fallback to demo
+                                  window.open('/demo-game.html', '_blank');
+                                }
+                              } catch (e) {
+                                console.error('Error opening game:', e);
+                                window.open('/demo-game.html', '_blank');
+                              }
+                            }}
+                            className="mt-2 px-4 py-2 bg-[#FF6B00] hover:bg-[#FF8C00] rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all w-full"
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                          >
+                            <Play className="w-4 h-4" />
+                            🎮 Play Game
+                          </motion.button>
+                        )}
+                        {asset.agentType === 'deploy' && asset.metadata && (() => {
+                          try {
+                            const metadata = typeof asset.metadata === 'string' 
+                              ? JSON.parse(asset.metadata) 
+                              : asset.metadata;
+                            if (metadata?.url) {
+                              return (
+                                <motion.a
+                                  href={metadata.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="mt-2 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all"
+                                  whileHover={{ scale: 1.05 }}
+                                  whileTap={{ scale: 0.95 }}
+                                >
+                                  <Play className="w-4 h-4" />
+                                  Play Game (Vercel)
+                                </motion.a>
+                              );
+                            }
+                          } catch (e) {
+                            return null;
+                          }
+                          return null;
+                        })()}
                       </motion.div>
                     ))}
                   </div>

@@ -29,7 +29,9 @@ class SoundManager {
     const sound = this.sounds.get(soundName);
     if (sound) {
       sound.currentTime = 0;
-      sound.play().catch(() => {});
+      sound.play().catch((error) => {
+        console.log('Sound play failed (user interaction required):', soundName);
+      });
     }
   }
 

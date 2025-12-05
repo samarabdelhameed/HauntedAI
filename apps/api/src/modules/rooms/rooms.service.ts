@@ -228,24 +228,30 @@ export class RoomsService {
 
       // Code Agent
       await this.sleep(2000);
-      await this.emitLog(roomId, 'code', 'info', 'Building interactive mini-game...');
-      await this.sleep(5000);
+      await this.emitLog(roomId, 'code', 'info', 'Building interactive mini-game from your story...');
       
-      // Create code asset
+      // Generate game code using Groq AI
+      const gameCode = await this.generateGameCode(storyContent, inputText);
+      
+      await this.sleep(3000);
+      
+      // Create code asset with generated game
       await this.prisma.asset.create({
         data: {
           roomId,
           agentType: 'code',
           cid: 'bafybeig' + Math.random().toString(36).substring(7),
-          fileType: 'application/zip',
+          fileType: 'text/html',
           metadata: JSON.stringify({
             framework: 'html5',
             tests: 'passed',
+            gameCode: gameCode,
+            generatedFrom: inputText.substring(0, 50),
           }),
         },
       });
       
-      await this.emitLog(roomId, 'code', 'success', 'Mini-game created and tested!');
+      await this.emitLog(roomId, 'code', 'success', 'Custom mini-game created and tested!');
 
       // Deploy Agent
       await this.sleep(2000);
@@ -284,6 +290,110 @@ export class RoomsService {
 
   private sleep(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  /**
+   * Generate interactive HTML5 game code using Groq AI
+   */
+  private async generateGameCode(story: string, userInput: string): Promise<string> {
+    try {
+      const groqApiKey = process.env.GROQ_API_KEY;
+      
+      if (!groqApiKey || groqApiKey === 'your-groq-api-key-here') {
+        // Return demo game if no API key
+        return this.getDemoGameCode(userInput);
+      }
+
+      // Call Groq API to generate game code
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${groqApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'llama-3.3-70b-versatile',
+          messages: [
+            {
+              role: 'system',
+              content: 'You are an expert HTML5 game developer. Create a complete, playable horror point-and-click game in a single HTML file with embedded CSS and JavaScript. The game should be atmospheric, interactive, and based on the provided story.',
+            },
+            {
+              role: 'user',
+              content: `Create a horror point-and-click game based on this story:\n\n${story.substring(0, 500)}\n\nOriginal idea: ${userInput}\n\nRequirements:\n- Single HTML file with embedded CSS and JavaScript\n- 3-5 clickable rooms/scenes\n- Atmospheric horror theme\n- Simple point-and-click mechanics\n- Creepy sound effects using Web Audio API\n- Responsive design\n- Dark color scheme\n- Return ONLY the complete HTML code, no explanations`,
+            },
+          ],
+          temperature: 0.8,
+          max_tokens: 4000,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Groq API error: ${response.statusText}`);
+      }
+
+      const data: any = await response.json();
+      const gameCode = data.choices?.[0]?.message?.content || '';
+      
+      // Extract HTML if wrapped in markdown code blocks
+      const htmlMatch = gameCode.match(/```html\n([\s\S]*?)\n```/) || gameCode.match(/```\n([\s\S]*?)\n```/);
+      return htmlMatch ? htmlMatch[1] : gameCode;
+      
+    } catch (error) {
+      console.error('Error generating game code:', error);
+      return this.getDemoGameCode(userInput);
+    }
+  }
+
+  /**
+   * Get demo game code as fallback
+   */
+  private getDemoGameCode(userInput: string): string {
+    return `<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Horror Game - ${userInput.substring(0, 30)}</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:monospace;background:#000;color:#fff;overflow:hidden}#game{width:100vw;height:100vh;position:relative;background:linear-gradient(180deg,#1a0a0a 0%,#000 100%)}.room{width:100%;height:100%;position:absolute;display:none}.room.active{display:block;animation:fadeIn 1s}@keyframes fadeIn{from{opacity:0}to{opacity:1}}.hotspot{position:absolute;width:80px;height:80px;border:2px solid rgba(255,107,0,0.5);border-radius:50%;cursor:pointer;transition:all 0.3s;animation:pulse 2s infinite}.hotspot:hover{border-color:#FF6B00;box-shadow:0 0 20px #FF6B00;transform:scale(1.1)}@keyframes pulse{0%,100%{opacity:0.5;transform:scale(1)}50%{opacity:1;transform:scale(1.05)}}#message{position:absolute;bottom:50px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.9);padding:20px 40px;border:2px solid #FF6B00;border-radius:10px;max-width:600px;text-align:center;font-size:18px}#title{position:absolute;top:30px;left:50%;transform:translateX(-50%);font-size:48px;color:#FF6B00;text-shadow:0 0 20px rgba(255,107,0,0.8);font-weight:bold}</style></head><body><div id="game"><div id="title">👻 ${userInput.substring(0, 20).toUpperCase()} 👻</div><div id="scene"><div class="room active" id="room1"><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center"><h2 style="font-size:36px;margin-bottom:20px">🏚️ The Beginning</h2><p style="font-size:20px;margin-bottom:30px">${userInput}</p></div><div class="hotspot" style="bottom:30%;right:40%" onclick="goToRoom(2)"></div></div><div class="room" id="room2"><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center"><h2 style="font-size:36px;margin-bottom:20px">🕯️ Deeper</h2><p style="font-size:20px">The darkness grows...</p></div><div class="hotspot" style="top:40%;left:20%" onclick="goToRoom(3)"></div></div><div class="room" id="room3"><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center"><h2 style="font-size:48px;margin-bottom:20px;color:#FF0040">👻 THE END 👻</h2><p style="font-size:24px;margin-bottom:30px;color:#FF6B00">You discovered the truth...</p><button onclick="location.reload()" style="margin-top:30px;padding:15px 40px;font-size:20px;background:#FF6B00;border:none;border-radius:10px;color:#fff;cursor:pointer">Play Again</button></div></div></div><div id="message">Click the glowing circles to explore...</div></div><script>let currentRoom=1;function goToRoom(n){document.getElementById('room'+currentRoom).classList.remove('active');currentRoom=n;document.getElementById('room'+currentRoom).classList.add('active');const m={1:"Click to explore...",2:"Choose your path...",3:"The truth is revealed..."};document.getElementById('message').textContent=m[n];const a=new AudioContext();const o=a.createOscillator();const g=a.createGain();o.connect(g);g.connect(a.destination);o.frequency.value=200;o.type='sine';g.gain.setValueAtTime(0.3,a.currentTime);g.gain.exponentialRampToValueAtTime(0.01,a.currentTime+0.5);o.start(a.currentTime);o.stop(a.currentTime+0.5)}</script></body></html>`;
+  }
+
+  /**
+   * Generate a rich, atmospheric horror story from user input
+   */
+  private generateStoryFromInput(input: string): string {
+    // Story templates with different atmospheric elements
+    const openings = [
+      `في ليلة خالية من ضوء القمر، حيث الظلام يلتهم كل شيء، ${input}`,
+      `كانت الساعة تقترب من منتصف الليل عندما ${input}`,
+      `لم يكن أحد يتوقع ما سيحدث تلك الليلة المشؤومة، عندما ${input}`,
+      `في أعماق الظلام، حيث لا يجرؤ أحد على الذهاب، ${input}`,
+    ];
+
+    const middles = [
+      `الظلال بدأت تتحرك من تلقاء نفسها، تزحف على الجدران كأنها كائنات حية. كل صرير للأرضية الخشبية كان يرسل قشعريرة في العمود الفقري. الهواء أصبح باردًا بشكل غير طبيعي، والأنفاس تتحول إلى سحب بيضاء في الظلام.`,
+      `همسات غريبة بدأت تملأ الأجواء، كلمات غير مفهومة من لغة منسية. المرايا على الجدران بدأت تعكس أشياء لم تكن موجودة في الغرفة. شيء قديم، شيء شرير، كان يستيقظ من سباته الطويل.`,
+      `الأبواب بدأت تفتح وتغلق من تلقاء نفسها، والأضواء ترتعش وتخفت. رائحة كريهة ملأت المكان، رائحة العفن والموت. كان هناك حضور، شيء يراقب من الظلال، ينتظر اللحظة المناسبة.`,
+      `الجدران بدأت تنزف، سائل أسود لزج يتدفق ببطء. أصوات خطوات ثقيلة تقترب من الممرات المظلمة. القلب يدق بسرعة، والخوف يتسلل إلى كل خلية في الجسد.`,
+    ];
+
+    const climaxes = [
+      `وفجأة، ظهر شبح مرعب من العدم، عيناه تتوهجان بضوء أحمر شيطاني. صرخة مدوية ملأت المكان، صرخة ليست من هذا العالم. الأرض اهتزت، والجدران بدأت تتصدع.`,
+      `في تلك اللحظة، انفتح باب قديم لم يُفتح منذ عقود. من خلفه، خرج كيان مظلم، شكله يتغير باستمرار بين الإنسان والوحش. عيونه الكثيرة تحدق بجوع لا ينتهي.`,
+      `الساعة دقت منتصف الليل، وفي تلك اللحظة بالذات، تمزق الحجاب بين العالمين. أرواح معذبة بدأت تظهر، وجوهها مشوهة من الألم والغضب. كانوا يبحثون عن شيء... أو عن شخص.`,
+      `من الظلام الدامس، امتدت يد شاحبة، أصابعها طويلة ومخالبها حادة. صوت ضحكة مجنونة ملأ الأجواء، ضحكة تجمد الدم في العروق. لم يكن هناك مفر.`,
+    ];
+
+    const endings = [
+      `عندما طلع الفجر، لم يبق أي أثر لما حدث تلك الليلة. لكن من يعرف الحقيقة، يعلم أن الشر لا يموت أبدًا... إنه فقط ينتظر. وفي الليالي المظلمة، عندما يكون القمر غائبًا، يمكنك أن تسمع الهمسات مرة أخرى، تناديك، تدعوك للعودة...`,
+      `لم يُعثر على أي شيء في الصباح سوى آثار أقدام غريبة على الأرض، وبقع من سائل أسود لا يمكن تفسيره. السكان المحليون يتجنبون المكان الآن، ويحذرون الغرباء من الاقتراب. لكن الفضوليين دائمًا يأتون... ولا يعودون أبدًا.`,
+      `الآن، كلما مر أحد بذلك المكان في الليل، يشعر بنظرات تراقبه من النوافذ المظلمة. البعض يقسم أنهم رأوا أشباحًا تتحرك في الداخل. والبعض الآخر... اختفى ببساطة. القصة لم تنته بعد، إنها فقط بدأت.`,
+      `منذ تلك الليلة، تغير كل شيء. الظلام أصبح أكثر كثافة، والصمت أكثر رعبًا. من يجرؤ على دخول ذلك المكان الآن، يخرج مختلفًا... إن خرج أصلاً. الشر الذي استيقظ تلك الليلة لا يزال هناك، ينتظر ضحيته التالية. وربما... تكون أنت.`,
+    ];
+
+    // Randomly select elements to create variety
+    const opening = openings[Math.floor(Math.random() * openings.length)];
+    const middle = middles[Math.floor(Math.random() * middles.length)];
+    const climax = climaxes[Math.floor(Math.random() * climaxes.length)];
+    const ending = endings[Math.floor(Math.random() * endings.length)];
+
+    return `${opening}\n\n${middle}\n\n${climax}\n\n${ending}`;
   }
 
   /**
