@@ -19,7 +19,16 @@ export class RoomsService {
    * Create a new room
    * Requirements: 8.1, 8.2
    */
-  async create(createRoomDto: CreateRoomDto) {
+  async create(createRoomDto: CreateRoomDto & { userId: string }) {
+    // Verify user exists
+    const user = await this.prisma.user.findUnique({
+      where: { id: createRoomDto.userId },
+    });
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
     const room = await this.prisma.room.create({
       data: {
         ownerId: createRoomDto.userId,
@@ -127,8 +136,10 @@ export class RoomsService {
       },
     });
 
-    // TODO: Trigger orchestrator service to start agent workflow
-    // This will be implemented in Task 5 (Orchestrator Service)
+    // Trigger mock workflow (simulates agent execution)
+    this.simulateWorkflow(id, room.inputText).catch((error) => {
+      console.error('Workflow simulation error:', error);
+    });
 
     return {
       ...updatedRoom,
@@ -158,6 +169,58 @@ export class RoomsService {
     });
 
     return updatedRoom;
+  }
+
+  /**
+   * Simulate workflow execution (mock implementation)
+   */
+  private async simulateWorkflow(roomId: string, inputText: string): Promise<void> {
+    try {
+      // Story Agent
+      await this.sleep(2000);
+      await this.emitLog(roomId, 'story', 'info', 'Generating spooky story from your input...');
+      await this.sleep(3000);
+      await this.emitLog(roomId, 'story', 'success', 'Story generated successfully!', {
+        length: 500,
+        theme: 'haunted house',
+      });
+
+      // Asset Agent
+      await this.sleep(2000);
+      await this.emitLog(roomId, 'asset', 'info', 'Creating haunting image for your story...');
+      await this.sleep(4000);
+      await this.emitLog(roomId, 'asset', 'success', 'Image generated and uploaded to IPFS!', {
+        cid: 'bafybeig...',
+      });
+
+      // Code Agent
+      await this.sleep(2000);
+      await this.emitLog(roomId, 'code', 'info', 'Building interactive mini-game...');
+      await this.sleep(5000);
+      await this.emitLog(roomId, 'code', 'success', 'Mini-game created and tested!', {
+        tests: 'passed',
+      });
+
+      // Deploy Agent
+      await this.sleep(2000);
+      await this.emitLog(roomId, 'deploy', 'info', 'Deploying to Vercel...');
+      await this.sleep(3000);
+      await this.emitLog(roomId, 'deploy', 'success', 'Deployment complete!', {
+        url: 'https://haunted-story-xyz.vercel.app',
+      });
+
+      // Complete
+      await this.sleep(1000);
+      await this.emitLog(roomId, 'orchestrator', 'success', '🎉 Workflow completed successfully!');
+      await this.updateStatus(roomId, 'done');
+    } catch (error) {
+      await this.emitLog(roomId, 'orchestrator', 'error', 'Workflow failed: ' + error.message);
+      await this.updateStatus(roomId, 'error');
+    }
+  }
+
+  private sleep(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   /**

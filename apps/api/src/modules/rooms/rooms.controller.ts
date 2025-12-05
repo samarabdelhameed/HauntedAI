@@ -21,6 +21,7 @@ import {
 import { Response } from 'express';
 
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { JwtOrQueryAuthGuard } from '../auth/guards/jwt-or-query-auth.guard';
 
 import { RoomsService } from './rooms.service';
 import { SSEService } from './sse.service';
@@ -63,7 +64,11 @@ export class RoomsController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async create(@Body() createRoomDto: CreateRoomDto, @Request() req: any) {
     // Get user ID from JWT token
-    const userId = req.user.sub;
+    const userId = req.user?.sub || req.user?.id;
+
+    if (!userId) {
+      throw new Error('User ID not found in token');
+    }
 
     return this.roomsService.create({
       ...createRoomDto,
@@ -144,6 +149,7 @@ export class RoomsController {
   }
 
   @Get(':id/logs')
+  @UseGuards(JwtOrQueryAuthGuard) // Override class-level guard to accept query token
   @ApiOperation({ summary: 'Stream live logs for room via Server-Sent Events' })
   @ApiParam({ name: 'id', description: 'Room UUID' })
   @ApiResponse({

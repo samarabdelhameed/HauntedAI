@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Send, Copy, X, Terminal, Play } from 'lucide-react';
+import { Send, Copy, X, Terminal, Play, BookOpen } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -23,8 +23,11 @@ export default function LiveRoom() {
   const [logs, setLogs] = useState<Log[]>([]);
   const [isStarting, setIsStarting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [storyText, setStoryText] = useState<string | null>(null);
+  const [isLoadingStory, setIsLoadingStory] = useState(false);
   const logsEndRef = useRef<HTMLDivElement>(null);
   const sseRef = useRef<EventSource | null>(null);
+  const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -43,6 +46,10 @@ export default function LiveRoom() {
       // Cleanup SSE connection
       if (sseRef.current) {
         sseRef.current.close();
+      }
+      // Cleanup refresh interval
+      if (refreshIntervalRef.current) {
+        clearInterval(refreshIntervalRef.current);
       }
     };
   }, [id, isAuthenticated, navigate]);
@@ -67,8 +74,19 @@ export default function LiveRoom() {
 
       setRoom(response.data);
 
+      // Load story if available
+      await loadStory(response.data);
+
       // Connect to SSE for live logs
       connectSSE();
+      
+      // Stop refresh interval if room is done or error
+      if (response.data?.status === 'done' || response.data?.status === 'error') {
+        if (refreshIntervalRef.current) {
+          clearInterval(refreshIntervalRef.current);
+          refreshIntervalRef.current = null;
+        }
+      }
     } catch (error) {
       console.error('Failed to load room:', error);
       alert('Failed to load room');
@@ -130,13 +148,91 @@ export default function LiveRoom() {
         },
       ]);
 
-      // Reload room data
-      await loadRoom();
+      // Reload room data periodically to get updated assets
+      if (refreshIntervalRef.current) {
+        clearInterval(refreshIntervalRef.current);
+      }
+      
+      refreshIntervalRef.current = setInterval(async () => {
+        await loadRoom();
+      }, 3000); // Check every 3 seconds
+
+      // Clear interval after 60 seconds or when room is done
+      setTimeout(() => {
+        if (refreshIntervalRef.current) {
+          clearInterval(refreshIntervalRef.current);
+          refreshIntervalRef.current = null;
+        }
+      }, 60000);
     } catch (error) {
       console.error('Failed to start workflow:', error);
       alert('Failed to start workflow');
     } finally {
       setIsStarting(false);
+    }
+  };
+
+  const loadStory = async (roomData: any) => {
+    if (!roomData?.assets) return;
+
+    // Find story asset
+    const storyAsset = roomData.assets.find((asset: any) => asset.agentType === 'story');
+    if (!storyAsset) return;
+
+    try {
+      setIsLoadingStory(true);
+      
+      // First, check if story content is in metadata
+      if (storyAsset.metadata?.content) {
+        setStoryText(storyAsset.metadata.content);
+        return;
+      }
+
+      // If not in metadata, try to fetch from IPFS
+      if (storyAsset.cid) {
+        // Try multiple IPFS gateways
+        const gateways = [
+          `https://w3s.link/ipfs/${storyAsset.cid}`,
+          `https://ipfs.io/ipfs/${storyAsset.cid}`,
+          `https://gateway.pinata.cloud/ipfs/${storyAsset.cid}`,
+          `https://${storyAsset.cid}.ipfs.w3s.link/`,
+        ];
+
+        let storyLoaded = false;
+        
+        for (const gatewayUrl of gateways) {
+          try {
+            const response = await fetch(gatewayUrl, {
+              method: 'GET',
+              headers: {
+                'Accept': 'text/plain, text/*, */*',
+              },
+            });
+            
+            if (response.ok) {
+              const text = await response.text();
+              if (text && text.trim().length > 0) {
+                setStoryText(text);
+                storyLoaded = true;
+                break;
+              }
+            }
+          } catch (error) {
+            // Try next gateway
+            continue;
+          }
+        }
+
+        if (!storyLoaded) {
+          // If we can't fetch from IPFS, set to null to show CID instead
+          setStoryText(null);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load story:', error);
+      setStoryText(null);
+    } finally {
+      setIsLoadingStory(false);
     }
   };
 
@@ -322,6 +418,59 @@ export default function LiveRoom() {
               animate={{ opacity: 1, x: 0 }}
               className="space-y-6"
             >
+              {/* Story Section */}
+              {room.assets?.some((asset: any) => asset.agentType === 'story') && (
+                <div>
+                  <h2 className="text-xl font-bold mb-4 text-[#FF6B00] flex items-center gap-2">
+                    <BookOpen className="w-5 h-5" />
+                    Generated Story
+                  </h2>
+                  {isLoadingStory ? (
+                    <div className="text-center text-gray-500 py-8">Loading story...</div>
+                  ) : storyText ? (
+                    <motion.div
+                      className="p-4 bg-white/5 rounded-lg border border-[#FF6B00]/20"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                    >
+                      <div className="prose prose-invert max-w-none">
+                        <p className="text-gray-300 whitespace-pre-wrap leading-relaxed text-sm">
+                          {storyText}
+                        </p>
+                      </div>
+                    </motion.div>
+                  ) : (
+                    <div className="p-4 bg-white/5 rounded-lg border border-[#FF6B00]/20">
+                      <p className="text-gray-400 text-sm mb-2">
+                        Story has been generated and uploaded to IPFS.
+                      </p>
+                      {room.assets
+                        .find((asset: any) => asset.agentType === 'story')
+                        ?.cid && (
+                        <div className="mt-2">
+                          <p className="text-xs text-gray-500 mb-1">CID:</p>
+                          <p className="font-mono text-xs text-gray-400 break-all">
+                            {room.assets.find((asset: any) => asset.agentType === 'story')?.cid}
+                          </p>
+                          <motion.button
+                            onClick={() =>
+                              copyToClipboard(
+                                room.assets.find((asset: any) => asset.agentType === 'story')?.cid || ''
+                              )
+                            }
+                            className="mt-2 px-3 py-1 bg-[#FF6B00]/20 hover:bg-[#FF6B00] rounded text-xs transition-all flex items-center gap-1"
+                            whileHover={{ scale: 1.05 }}
+                          >
+                            <Copy className="w-3 h-3" />
+                            Copy CID
+                          </motion.button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
               <div>
                 <h2 className="text-xl font-bold mb-4 text-[#FF6B00]">Assets</h2>
                 {room.assets && room.assets.length > 0 ? (

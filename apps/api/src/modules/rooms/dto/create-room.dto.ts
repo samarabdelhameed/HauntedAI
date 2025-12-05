@@ -14,12 +14,4 @@ export class CreateRoomDto {
   @MinLength(1)
   @MaxLength(5000)
   inputText!: string;
-
-  @ApiProperty({
-    description: 'User ID (from JWT)',
-    example: 'user-123',
-  })
-  @IsString()
-  @IsNotEmpty()
-  userId!: string;
 }

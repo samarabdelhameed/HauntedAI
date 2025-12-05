@@ -20,12 +20,16 @@ async function bootstrap() {
 
   // Enable CORS
   app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: [
+      'http://localhost:3000',
+      'http://localhost:5173',
+      process.env.FRONTEND_URL
+    ].filter(Boolean),
     credentials: true,
   });
 
   // Get webhook service
-  const webhookService = app.get('WebhookService');
+  const webhookService = app.get(WebhookService);
 
   // Global exception filter with logger and webhook
   app.useGlobalFilters(new AllExceptionsFilter(logger, webhookService));

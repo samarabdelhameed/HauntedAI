@@ -109,7 +109,7 @@ class ApiClient {
 
   // Auth endpoints
   async login(walletAddress: string, signature: string, message: string) {
-    return this.request('/auth/login', {
+    return this.request('/api/v1/auth/login', {
       method: 'POST',
       body: JSON.stringify({ walletAddress, signature, message }),
     });
@@ -117,26 +117,26 @@ class ApiClient {
 
   // Room endpoints
   async createRoom(inputText: string) {
-    return this.request('/rooms', {
+    return this.request('/api/v1/rooms', {
       method: 'POST',
       body: JSON.stringify({ inputText }),
     });
   }
 
   async getRoom(roomId: string) {
-    return this.request(`/rooms/${roomId}`, {
+    return this.request(`/api/v1/rooms/${roomId}`, {
       method: 'GET',
     });
   }
 
   async startRoom(roomId: string) {
-    return this.request(`/rooms/${roomId}/start`, {
+    return this.request(`/api/v1/rooms/${roomId}/start`, {
       method: 'POST',
     });
   }
 
   async listRooms() {
-    return this.request('/rooms', {
+    return this.request('/api/v1/rooms', {
       method: 'GET',
     });
   }
@@ -144,40 +144,42 @@ class ApiClient {
   // Asset endpoints
   async listAssets(filters?: { agentType?: string }) {
     const params = new URLSearchParams(filters as Record<string, string>);
-    return this.request(`/assets?${params.toString()}`, {
+    return this.request(`/api/v1/assets?${params.toString()}`, {
       method: 'GET',
     });
   }
 
   async getAsset(assetId: string) {
-    return this.request(`/assets/${assetId}`, {
+    return this.request(`/api/v1/assets/${assetId}`, {
       method: 'GET',
     });
   }
 
   // Explore endpoint (public)
   async exploreContent(page: number = 1, limit: number = 12) {
-    return this.request(`/assets/explore?page=${page}&limit=${limit}`, {
+    return this.request(`/api/v1/assets/explore?page=${page}&limit=${limit}`, {
       method: 'GET',
     });
   }
 
   // Token endpoints
   async getBalance(did: string) {
-    return this.request(`/tokens/balance/${did}`, {
+    return this.request(`/api/v1/tokens/balance/${did}`, {
       method: 'GET',
     });
   }
 
   async getTransactions(did: string) {
-    return this.request(`/tokens/transactions/${did}`, {
+    return this.request(`/api/v1/tokens/transactions/${did}`, {
       method: 'GET',
     });
   }
 
   // SSE connection for live logs
   createSSEConnection(roomId: string, onMessage: (log: any) => void, onError?: (error: Event) => void) {
-    const url = `${this.baseUrl}/rooms/${roomId}/logs`;
+    // Include token as query parameter since EventSource doesn't support headers
+    const token = this.token || localStorage.getItem('jwt_token');
+    const url = `${this.baseUrl}/api/v1/rooms/${roomId}/logs${token ? `?token=${encodeURIComponent(token)}` : ''}`;
     
     // Only log in development mode
     if (process.env.NODE_ENV === 'development') {

@@ -22,10 +22,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     resolve: {
-      alias: isDevelopment ? {
-        'react': 'react/index.js',
-        'react-dom': 'react-dom/index.js',
-      } : {},
+      alias: {},
     },
     define: {
       'process.env.NODE_ENV': JSON.stringify(isProduction ? 'production' : 'development'),

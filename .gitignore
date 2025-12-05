@@ -56,3 +56,4 @@ prisma/migrations/
 apps/blockchain/artifacts/
 apps/blockchain/cache/
 apps/blockchain/typechain-types/
+.vercel
