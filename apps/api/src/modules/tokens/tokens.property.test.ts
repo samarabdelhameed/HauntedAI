@@ -7,6 +7,7 @@ import * as fc from 'fast-check';
 
 import { TokensService } from './tokens.service';
 import { PrismaService } from '../../prisma/prisma.service';
+import { BlockchainService } from './blockchain.service';
 
 describe('Token Rewards Property-Based Tests', () => {
   let service: TokensService;
@@ -26,6 +27,15 @@ describe('Token Rewards Property-Based Tests', () => {
               findMany: jest.fn(),
               create: jest.fn(),
             },
+          },
+        },
+        {
+          provide: BlockchainService,
+          useValue: {
+            rewardUpload: jest.fn(),
+            rewardView: jest.fn(),
+            rewardReferral: jest.fn(),
+            grantBadge: jest.fn(),
           },
         },
       ],

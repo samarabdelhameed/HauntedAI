@@ -88,6 +88,7 @@
   "common": {
     "connecting": "Connecting...",
     "connected": "Connected",
+    "disconnect": "Disconnect",
     "active": "active",
     "view": "View",
     "copy": "Copy",

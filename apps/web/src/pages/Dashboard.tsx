@@ -1,11 +1,17 @@
 import { motion } from 'framer-motion';
-import { Bot, Plus, Activity, Clock, Eye, User, LogOut } from 'lucide-react';
+import { Bot, Plus, Activity, Clock, Eye, User, LogOut, AlertCircle, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { apiClient } from '../utils/apiClient';
 import AnimatedBackground from '../components/AnimatedBackground';
 import { soundManager } from '../utils/soundManager';
+
+interface Notification {
+  id: string;
+  message: string;
+  type: 'error' | 'warning' | 'info';
+}
 
 export default function Dashboard() {
   const [showModal, setShowModal] = useState(false);
@@ -14,8 +20,23 @@ export default function Dashboard() {
   const [rooms, setRooms] = useState<any[]>([]);
   const [balance, setBalance] = useState('0');
   const [isLoading, setIsLoading] = useState(true);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const navigate = useNavigate();
   const { user, logout, isAuthenticated } = useAuth();
+
+  const showNotification = (message: string, type: 'error' | 'warning' | 'info' = 'warning') => {
+    const id = Date.now().toString();
+    setNotifications((prev) => [...prev, { id, message, type }]);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+      setNotifications((prev) => prev.filter((n) => n.id !== id));
+    }, 5000);
+  };
+
+  const removeNotification = (id: string) => {
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
+  };
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -31,20 +52,42 @@ export default function Dashboard() {
       setIsLoading(true);
 
       // Load rooms
+      try {
       const roomsResponse = await apiClient.listRooms();
-      if (roomsResponse.data) {
+        if (roomsResponse.data && !roomsResponse.error) {
         setRooms(roomsResponse.data as any[]);
+        } else {
+          // API returned error - set empty rooms
+          setRooms([]);
+        }
+      } catch (error) {
+        // API not available - continue with empty rooms
+        setRooms([]);
       }
 
       // Load balance
       if (user?.did) {
+        try {
         const balanceResponse = await apiClient.getBalance(user.did);
-        if (balanceResponse.data) {
+          if (balanceResponse.data && !balanceResponse.error) {
           setBalance((balanceResponse.data as any).balance || '0');
+          } else {
+            // API returned error - use default balance
+            setBalance('0');
+          }
+        } catch (error) {
+          // API not available - use default balance
+          setBalance('0');
         }
       }
     } catch (error) {
+      // Only log unexpected errors in development
+      if (process.env.NODE_ENV === 'development') {
       console.error('Failed to load dashboard data:', error);
+      }
+      // Set defaults on error
+      setRooms([]);
+      setBalance('0');
     } finally {
       setIsLoading(false);
     }
@@ -52,7 +95,7 @@ export default function Dashboard() {
 
   const handleCreateRoom = async () => {
     if (!inputText.trim()) {
-      alert('Please enter your haunted idea!');
+      showNotification('Please enter your haunted idea!', 'warning');
       return;
     }
 
@@ -63,7 +106,14 @@ export default function Dashboard() {
       const response = await apiClient.createRoom(inputText);
 
       if (response.error || !response.data) {
-        alert('Failed to create room: ' + response.error);
+        // Check if it's a connection error
+        const errorMsg = response.error || '';
+        if (errorMsg.includes('Failed to fetch') || errorMsg.includes('Network error') || response.status === 0) {
+          showNotification('API غير متاح. تأكد أن API يعمل: npm run dev:api', 'warning');
+        } else {
+          showNotification(`Failed to create room: ${response.error}`, 'error');
+        }
+        setIsCreating(false);
         return;
       }
 
@@ -74,9 +124,16 @@ export default function Dashboard() {
       
       // Navigate to the new room
       navigate(`/room/${room.id}`);
-    } catch (error) {
+    } catch (error: any) {
+      const errorMessage = error?.message || '';
+      if (errorMessage.includes('Failed to fetch') || errorMessage.includes('ERR_CONNECTION_REFUSED')) {
+        showNotification('API غير متاح. تأكد أن API يعمل: npm run dev:api', 'warning');
+      } else {
+        if (process.env.NODE_ENV === 'development') {
       console.error('Failed to create room:', error);
-      alert('Failed to create room. Please try again.');
+        }
+        showNotification('Failed to create room. Please try again.', 'error');
+      }
     } finally {
       setIsCreating(false);
     }
@@ -122,6 +179,61 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen relative">
       <AnimatedBackground />
+
+      {/* Notifications */}
+      <div className="fixed top-20 right-4 z-50 space-y-2">
+        {notifications.map((notification) => (
+          <motion.div
+            key={notification.id}
+            initial={{ opacity: 0, x: 100 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 100 }}
+            className={`glass border-2 ${
+              notification.type === 'error'
+                ? 'border-red-500/50 bg-red-900/20'
+                : notification.type === 'warning'
+                ? 'border-yellow-500/50 bg-yellow-900/20'
+                : 'border-blue-500/50 bg-blue-900/20'
+            } p-4 rounded-lg shadow-lg max-w-md`}
+          >
+            <div className="flex items-start gap-3">
+              <AlertCircle
+                className={`w-6 h-6 flex-shrink-0 mt-0.5 ${
+                  notification.type === 'error'
+                    ? 'text-red-400'
+                    : notification.type === 'warning'
+                    ? 'text-yellow-400'
+                    : 'text-blue-400'
+                }`}
+              />
+              <div className="flex-1">
+                <p
+                  className={`text-sm ${
+                    notification.type === 'error'
+                      ? 'text-red-300'
+                      : notification.type === 'warning'
+                      ? 'text-yellow-300'
+                      : 'text-blue-300'
+                  }`}
+                >
+                  {notification.message}
+                </p>
+                {notification.type === 'warning' && (
+                  <p className="text-xs text-gray-400 mt-2">
+                    لتشغيل API: <code className="bg-black/30 px-1 rounded">npm run dev:api</code>
+                  </p>
+                )}
+              </div>
+              <button
+                onClick={() => removeNotification(notification.id)}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </motion.div>
+        ))}
+      </div>
 
       <div className="flex">
         <aside className="w-64 h-screen glass border-r border-gray-800 p-6 sticky top-0">

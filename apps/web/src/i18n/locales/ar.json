@@ -88,6 +88,7 @@
   "common": {
     "connecting": "جاري الاتصال...",
     "connected": "متصل",
+    "disconnect": "قطع الاتصال",
     "active": "نشط",
     "view": "عرض",
     "copy": "نسخ",

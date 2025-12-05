@@ -2,6 +2,7 @@
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import { StoryService } from './story.service';
+import { AgentMetrics } from '@hauntedai/shared';
 import {
   StoryGenerationRequest,
   StoryGenerationResponse,
@@ -12,12 +13,14 @@ import {
 export class StoryAgentServer {
   private app: express.Application;
   private storyService: StoryService;
+  private metrics: AgentMetrics;
   private port: number;
 
   constructor(apiKey: string, port: number = 3002) {
     this.app = express();
     this.port = port;
     this.storyService = new StoryService(apiKey);
+    this.metrics = new AgentMetrics('story');
     this.setupMiddleware();
     this.setupRoutes();
     this.setupErrorHandling();
@@ -28,9 +31,16 @@ export class StoryAgentServer {
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
 
-    // Request logging
+    // Request logging and metrics
     this.app.use((req: Request, res: Response, next: NextFunction) => {
+      const startTime = Date.now();
       console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+      
+      res.on('finish', () => {
+        const duration = (Date.now() - startTime) / 1000;
+        this.metrics.recordHttpRequest(req.method, req.path, res.statusCode, duration);
+      });
+      
       next();
     });
   }
@@ -66,6 +76,7 @@ export class StoryAgentServer {
 
     // Story generation endpoint
     this.app.post('/generate', async (req: Request, res: Response, next: NextFunction) => {
+      const startTime = Date.now();
       try {
         const request: StoryGenerationRequest = {
           input: req.body.input,
@@ -77,13 +88,30 @@ export class StoryAgentServer {
 
         const response: StoryGenerationResponse = await this.storyService.generateStory(request);
 
+        const duration = (Date.now() - startTime) / 1000;
+        this.metrics.recordExecution('story', 'success', duration);
+
         console.log(
           `Story generated successfully (${response.metadata.wordCount} words)`
         );
 
         res.status(200).json(response);
       } catch (error) {
+        const duration = (Date.now() - startTime) / 1000;
+        this.metrics.recordExecution('story', 'failure', duration);
+        this.metrics.recordFailure('story', error.name || 'UnknownError');
         next(error);
+      }
+    });
+
+    // Metrics endpoint
+    this.app.get('/metrics', async (req: Request, res: Response) => {
+      try {
+        const metrics = await this.metrics.getMetrics();
+        res.set('Content-Type', this.metrics.getContentType());
+        res.send(metrics);
+      } catch (error) {
+        res.status(500).json({ error: 'Failed to get metrics' });
       }
     });
 
@@ -96,6 +124,7 @@ export class StoryAgentServer {
         endpoints: {
           health: 'GET /health',
           generate: 'POST /generate',
+          metrics: 'GET /metrics',
         },
       });
     });

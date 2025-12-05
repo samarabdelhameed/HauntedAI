@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 // Load environment variables FIRST before any other imports
 dotenv.config();
 
-import { startServer } from './server';
+import { CodeAgentServer } from './server';
 
 // Validate required environment variables
 if (!process.env.HUGGINGFACE_API_KEY) {
@@ -14,4 +14,5 @@ if (!process.env.HUGGINGFACE_API_KEY) {
 }
 
 // Start the server
-startServer();
+const server = new CodeAgentServer();
+server.start();

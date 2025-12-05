@@ -1,3 +1,164 @@
 {
-  "mcpServers": {}
+  "mcpServers": {
+    "openai-mcp": {
+      "command": "uvx",
+      "args": ["openai-mcp-server@latest"],
+      "env": {
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}",
+        "FASTMCP_LOG_LEVEL": "INFO"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "create_completion",
+        "create_chat_completion",
+        "create_image",
+        "create_embedding"
+      ]
+    },
+    "storacha-mcp": {
+      "command": "uvx", 
+      "args": ["storacha-mcp-server@latest"],
+      "env": {
+        "STORACHA_DID": "${STORACHA_DID}",
+        "STORACHA_PROOF": "${STORACHA_PROOF}",
+        "FASTMCP_LOG_LEVEL": "INFO"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "upload_file",
+        "retrieve_file",
+        "list_files",
+        "get_file_info"
+      ]
+    },
+    "blockchain-mcp": {
+      "command": "uvx",
+      "args": ["web3-mcp-server@latest"],
+      "env": {
+        "POLYGON_RPC_URL": "${POLYGON_RPC_URL}",
+        "PRIVATE_KEY": "${PRIVATE_KEY}",
+        "HHCW_TOKEN_ADDRESS": "${HHCW_TOKEN_ADDRESS}",
+        "GHOST_BADGE_ADDRESS": "${GHOST_BADGE_ADDRESS}",
+        "TREASURY_ADDRESS": "${TREASURY_ADDRESS}",
+        "FASTMCP_LOG_LEVEL": "INFO"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "get_balance",
+        "get_transaction",
+        "call_contract",
+        "send_transaction"
+      ]
+    },
+    "database-mcp": {
+      "command": "uvx",
+      "args": ["postgres-mcp-server@latest"],
+      "env": {
+        "DATABASE_URL": "${DATABASE_URL}",
+        "FASTMCP_LOG_LEVEL": "INFO"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "query",
+        "execute",
+        "get_schema",
+        "list_tables"
+      ]
+    },
+    "redis-mcp": {
+      "command": "uvx",
+      "args": ["redis-mcp-server@latest"],
+      "env": {
+        "REDIS_URL": "${REDIS_URL}",
+        "FASTMCP_LOG_LEVEL": "INFO"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "get",
+        "set",
+        "delete",
+        "publish",
+        "subscribe"
+      ]
+    },
+    "docker-mcp": {
+      "command": "uvx",
+      "args": ["docker-mcp-server@latest"],
+      "env": {
+        "DOCKER_HOST": "unix:///var/run/docker.sock",
+        "FASTMCP_LOG_LEVEL": "INFO"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "list_containers",
+        "get_container_logs",
+        "get_container_stats",
+        "list_images"
+      ]
+    },
+    "github-mcp": {
+      "command": "uvx",
+      "args": ["github-mcp-server@latest"],
+      "env": {
+        "GITHUB_TOKEN": "${GITHUB_TOKEN}",
+        "GITHUB_REPO": "hauntedai/platform",
+        "FASTMCP_LOG_LEVEL": "INFO"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "get_repository",
+        "list_issues",
+        "create_issue",
+        "get_pull_request",
+        "list_commits"
+      ]
+    },
+    "vercel-mcp": {
+      "command": "uvx",
+      "args": ["vercel-mcp-server@latest"],
+      "env": {
+        "VERCEL_TOKEN": "${VERCEL_TOKEN}",
+        "VERCEL_PROJECT_ID": "${VERCEL_PROJECT_ID}",
+        "FASTMCP_LOG_LEVEL": "INFO"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "list_deployments",
+        "get_deployment",
+        "create_deployment",
+        "get_project"
+      ]
+    },
+    "prometheus-mcp": {
+      "command": "uvx",
+      "args": ["prometheus-mcp-server@latest"],
+      "env": {
+        "PROMETHEUS_URL": "http://localhost:9090",
+        "FASTMCP_LOG_LEVEL": "INFO"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "query",
+        "query_range",
+        "get_metrics",
+        "get_targets"
+      ]
+    },
+    "grafana-mcp": {
+      "command": "uvx",
+      "args": ["grafana-mcp-server@latest"],
+      "env": {
+        "GRAFANA_URL": "http://localhost:3010",
+        "GRAFANA_API_KEY": "${GRAFANA_API_KEY}",
+        "FASTMCP_LOG_LEVEL": "INFO"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "get_dashboard",
+        "list_dashboards",
+        "create_dashboard",
+        "get_datasource"
+      ]
+    }
+  }
 }

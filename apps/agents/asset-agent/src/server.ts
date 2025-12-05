@@ -2,6 +2,7 @@
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import { AssetService } from './asset.service';
+import { AgentMetrics } from '@hauntedai/shared';
 import {
   AssetGenerationRequest,
   AssetGenerationResponse,
@@ -12,12 +13,14 @@ import {
 export class AssetAgentServer {
   private app: express.Application;
   private assetService: AssetService;
+  private metrics: AgentMetrics;
   private port: number;
 
   constructor(apiKey: string, port: number = 3003) {
     this.app = express();
     this.port = port;
     this.assetService = new AssetService(apiKey);
+    this.metrics = new AgentMetrics('asset');
     this.setupMiddleware();
     this.setupRoutes();
     this.setupErrorHandling();
@@ -28,9 +31,16 @@ export class AssetAgentServer {
     this.app.use(express.json({ limit: '10mb' })); // Increased limit for story content
     this.app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-    // Request logging
+    // Request logging and metrics
     this.app.use((req: Request, res: Response, next: NextFunction) => {
+      const startTime = Date.now();
       console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+      
+      res.on('finish', () => {
+        const duration = (Date.now() - startTime) / 1000;
+        this.metrics.recordHttpRequest(req.method, req.path, res.statusCode, duration);
+      });
+      
       next();
     });
   }
@@ -66,6 +76,7 @@ export class AssetAgentServer {
 
     // Asset generation endpoint
     this.app.post('/generate', async (req: Request, res: Response, next: NextFunction) => {
+      const startTime = Date.now();
       try {
         // Validate required fields
         if (!req.body.story || typeof req.body.story !== 'string' || req.body.story.trim().length === 0) {
@@ -109,13 +120,30 @@ export class AssetAgentServer {
 
         const response: AssetGenerationResponse = await this.assetService.generateAsset(request);
 
+        const duration = (Date.now() - startTime) / 1000;
+        this.metrics.recordExecution('asset', 'success', duration);
+
         console.log(
           `Asset generated successfully (${response.metadata.size} bytes, CID: ${response.imageCid})`
         );
 
         res.status(200).json(response);
       } catch (error) {
+        const duration = (Date.now() - startTime) / 1000;
+        this.metrics.recordExecution('asset', 'failure', duration);
+        this.metrics.recordFailure('asset', error.name || 'UnknownError');
         next(error);
+      }
+    });
+
+    // Metrics endpoint
+    this.app.get('/metrics', async (req: Request, res: Response) => {
+      try {
+        const metrics = await this.metrics.getMetrics();
+        res.set('Content-Type', this.metrics.getContentType());
+        res.send(metrics);
+      } catch (error) {
+        res.status(500).json({ error: 'Failed to get metrics' });
       }
     });
 
@@ -128,6 +156,7 @@ export class AssetAgentServer {
         endpoints: {
           health: 'GET /health',
           generate: 'POST /generate',
+          metrics: 'GET /metrics',
         },
       });
     });

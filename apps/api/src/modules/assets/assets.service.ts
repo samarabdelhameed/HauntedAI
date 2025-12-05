@@ -147,7 +147,7 @@ export class AssetsService {
         agentType: data.agentType,
         cid: data.cid,
         fileType: data.fileType,
-        fileSize: data.fileSize,
+        fileSize: data.fileSize ? Number(data.fileSize) : null,
         metadata: data.metadata,
       },
       include: {

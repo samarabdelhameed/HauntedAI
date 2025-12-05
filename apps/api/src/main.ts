@@ -5,9 +5,18 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/http-exception.filter';
+import { LoggerService } from './common/logger/logger.service';
+import { WebhookService } from './common/webhook/webhook.service';
+import { MetricsInterceptor } from './common/interceptors/metrics.interceptor';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    bufferLogs: true,
+  });
+
+  // Use custom Winston logger
+  const logger = app.get(LoggerService);
+  app.useLogger(logger);
 
   // Enable CORS
   app.enableCors({
@@ -15,8 +24,15 @@ async function bootstrap() {
     credentials: true,
   });
 
-  // Global exception filter
-  app.useGlobalFilters(new AllExceptionsFilter());
+  // Get webhook service
+  const webhookService = app.get('WebhookService');
+
+  // Global exception filter with logger and webhook
+  app.useGlobalFilters(new AllExceptionsFilter(logger, webhookService));
+
+  // Global metrics interceptor
+  const metricsInterceptor = app.get(MetricsInterceptor);
+  app.useGlobalInterceptors(metricsInterceptor);
 
   // Global validation pipe
   app.useGlobalPipes(
@@ -33,25 +49,81 @@ async function bootstrap() {
   // Swagger documentation
   const config = new DocumentBuilder()
     .setTitle('HauntedAI API')
-    .setDescription('Multi-agent AI platform API documentation')
-    .setVersion('1.0')
-    .addTag('auth', 'Authentication endpoints')
-    .addTag('rooms', 'Room management endpoints')
-    .addTag('assets', 'Asset management endpoints')
-    .addTag('tokens', 'Token and rewards endpoints')
-    .addTag('users', 'User management endpoints')
-    .addBearerAuth()
+    .setDescription(`
+      🎃 **HauntedAI Multi-Agent Platform API**
+      
+      A comprehensive API for managing autonomous AI agents that generate spooky content:
+      - **StoryAgent**: Generates personalized spooky stories using OpenAI GPT-4
+      - **AssetAgent**: Creates haunting images with DALL-E 3
+      - **CodeAgent**: Builds interactive mini-games with auto-testing
+      - **DeployAgent**: Deploys content to live URLs
+      
+      All content is stored on decentralized IPFS/Storacha network with permanent CIDs.
+      
+      **Features:**
+      - 🔐 Web3 wallet authentication
+      - 🏠 Room-based workflow management
+      - 📊 Real-time logs via Server-Sent Events
+      - 🪙 HHCW token rewards system
+      - 🏆 NFT achievement badges
+      - 🌐 Multi-language support (EN/AR)
+    `)
+    .setVersion('1.0.0')
+    .setContact('HauntedAI Team', 'https://github.com/hauntedai', 'team@hauntedai.com')
+    .setLicense('MIT', 'https://opensource.org/licenses/MIT')
+    .addServer('http://localhost:3001', 'Development Server')
+    .addServer('https://api.hauntedai.com', 'Production Server')
+    .addTag('auth', '🔐 Authentication - Web3 wallet login and JWT management')
+    .addTag('rooms', '🏠 Rooms - Workflow sessions and agent orchestration')
+    .addTag('assets', '🎨 Assets - Generated content (stories, images, code)')
+    .addTag('tokens', '🪙 Tokens - HHCW rewards and NFT badges')
+    .addTag('users', '👤 Users - Profile and account management')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'JWT',
+        description: 'Enter JWT token obtained from /auth/login',
+        in: 'header',
+      },
+      'JWT-auth'
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, document);
+  
+  // Enhanced Swagger UI options
+  SwaggerModule.setup('api/docs', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+      displayRequestDuration: true,
+      filter: true,
+      showExtensions: true,
+      showCommonExtensions: true,
+      tryItOutEnabled: true,
+      requestInterceptor: (req: any) => {
+        // Add custom headers or modify requests
+        return req;
+      },
+    },
+    customSiteTitle: 'HauntedAI API Documentation',
+    customfavIcon: '/favicon.ico',
+    customJs: [
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-bundle.min.js',
+    ],
+    customCssUrl: [
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.min.css',
+    ],
+  });
 
   const port = process.env.API_PORT || 3001;
   await app.listen(port);
 
-  console.log(`🚀 API Gateway running on port ${port}`);
-  console.log(`👻 HauntedAI - Where Agents Come Alive`);
-  console.log(`📚 API Docs: http://localhost:${port}/api/docs`);
+  logger.log(`🚀 API Gateway running on port ${port}`, 'Bootstrap');
+  logger.log(`👻 HauntedAI - Where Agents Come Alive`, 'Bootstrap');
+  logger.log(`📚 API Docs: http://localhost:${port}/api/docs`, 'Bootstrap');
+  logger.log(`📊 Metrics: http://localhost:${port}/metrics`, 'Bootstrap');
 }
 
 bootstrap();

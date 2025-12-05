@@ -4,13 +4,80 @@ import { PrismaClient } from '@prisma/client';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
+  private reconnectAttempts = 0;
+  private readonly maxReconnectAttempts = 5;
+  private readonly reconnectDelay = 5000; // 5 seconds
+  private isConnected = false;
+
   async onModuleInit() {
-    await this.$connect();
-    console.log('✅ Database connected');
+    await this.connectWithRetry();
+    if (process.env.NODE_ENV !== 'test') {
+      this.setupConnectionMonitoring();
+    }
   }
 
   async onModuleDestroy() {
     await this.$disconnect();
+    this.isConnected = false;
     console.log('❌ Database disconnected');
+  }
+
+  private async connectWithRetry(): Promise<void> {
+    while (this.reconnectAttempts < this.maxReconnectAttempts) {
+      try {
+        await this.$connect();
+        this.isConnected = true;
+        this.reconnectAttempts = 0;
+        console.log('✅ Database connected');
+        return;
+      } catch (error) {
+        this.reconnectAttempts++;
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        console.error(
+          `❌ Database connection failed (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts}):`,
+          errorMessage
+        );
+
+        if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+          throw new Error(
+            `Failed to connect to database after ${this.maxReconnectAttempts} attempts`
+          );
+        }
+
+        console.log(`⏳ Retrying in ${this.reconnectDelay / 1000} seconds...`);
+        await this.sleep(this.reconnectDelay);
+      }
+    }
+  }
+
+  private setupConnectionMonitoring(): void {
+    // Monitor connection health every 30 seconds
+    setInterval(async () => {
+      try {
+        await this.$queryRaw`SELECT 1`;
+        if (!this.isConnected) {
+          this.isConnected = true;
+          console.log('✅ Database connection restored');
+        }
+      } catch (error) {
+        if (this.isConnected) {
+          this.isConnected = false;
+          console.error('❌ Database connection lost, attempting to reconnect...');
+          this.reconnectAttempts = 0;
+          await this.connectWithRetry().catch((err) => {
+            const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+            console.error('❌ Failed to reconnect to database:', errorMessage);
+          });
+        }
+      }
+    }, 30000);
+  }
+
+  private sleep(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  getConnectionStatus(): boolean {
+    return this.isConnected;
   }
 }

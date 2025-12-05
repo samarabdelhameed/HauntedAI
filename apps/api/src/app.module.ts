@@ -8,9 +8,22 @@ import { RoomsModule } from './modules/rooms/rooms.module';
 import { TokensModule } from './modules/tokens/tokens.module';
 import { UsersModule } from './modules/users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { LoggerModule } from './common/logger/logger.module';
+import { MetricsModule } from './common/metrics/metrics.module';
+import { WebhookModule } from './common/webhook/webhook.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule, RoomsModule, AssetsModule, TokensModule, UsersModule],
+  imports: [
+    PrismaModule,
+    LoggerModule,
+    MetricsModule,
+    WebhookModule,
+    AuthModule,
+    RoomsModule,
+    AssetsModule,
+    TokensModule,
+    UsersModule,
+  ],
   controllers: [HealthController],
 })
 export class AppModule {}

@@ -44,6 +44,17 @@ class ApiClient {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
+    const isConnectionError = (error: any): boolean => {
+      const message = error?.message || String(error);
+      return (
+        message.includes('Failed to fetch') ||
+        message.includes('ERR_CONNECTION_REFUSED') ||
+        message.includes('NetworkError') ||
+        message.includes('Network request failed') ||
+        message.includes('Load failed')
+      );
+    };
+
     try {
       const response = await fetch(`${this.baseUrl}${endpoint}`, {
         ...options,
@@ -52,6 +63,22 @@ class ApiClient {
           ...options.headers,
         },
       });
+
+      // Handle JWT expiration (401 Unauthorized)
+      if (response.status === 401) {
+        // Clear expired token
+        this.clearToken();
+
+        // Trigger re-authentication by redirecting to home
+        if (typeof window !== 'undefined') {
+          window.location.href = '/';
+        }
+
+        return {
+          error: 'Authentication expired. Please sign in again.',
+          status: 401,
+        };
+      }
 
       const data = await response.json();
 
@@ -67,8 +94,14 @@ class ApiClient {
         status: response.status,
       };
     } catch (error) {
+      // Silently handle connection errors - they're expected when API is offline
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      
+      // Silently handle connection errors - they're expected when API is offline
+      // Global error handler in main.tsx will suppress console errors
+      
       return {
-        error: error instanceof Error ? error.message : 'Network error',
+        error: errorMessage,
         status: 0,
       };
     }
@@ -145,7 +178,11 @@ class ApiClient {
   // SSE connection for live logs
   createSSEConnection(roomId: string, onMessage: (log: any) => void, onError?: (error: Event) => void) {
     const url = `${this.baseUrl}/rooms/${roomId}/logs`;
-    console.log('Creating SSE connection to:', url);
+    
+    // Only log in development mode
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Creating SSE connection to:', url);
+    }
     
     const eventSource = new EventSource(url, { withCredentials: false });
 
@@ -154,12 +191,18 @@ class ApiClient {
         const log = JSON.parse(event.data);
         onMessage(log);
       } catch (error) {
-        console.error('Failed to parse log:', error);
+        // Only log parsing errors in development
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Failed to parse log:', error);
+        }
       }
     });
 
     eventSource.addEventListener('connected', (event) => {
-      console.log('SSE connected:', event.data);
+      // Only log in development mode
+      if (process.env.NODE_ENV === 'development') {
+        console.log('SSE connected:', event.data);
+      }
     });
 
     eventSource.addEventListener('heartbeat', () => {
@@ -167,7 +210,8 @@ class ApiClient {
     });
 
     eventSource.onerror = (error) => {
-      console.error('SSE error:', error);
+      // Don't log connection errors - they're expected when API is offline
+      // Only call onError callback for handling
       if (onError) onError(error);
     };
 

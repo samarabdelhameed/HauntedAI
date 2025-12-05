@@ -7,6 +7,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum AgentType {
+  story
+  asset
+  code
+  deploy
+}
+
 model User {
   id            String   @id @default(uuid())
   did           String   @unique
@@ -35,7 +42,7 @@ model Room {
 model Asset {
   id        String    @id @default(uuid())
   roomId    String
-  agentType String
+  agentType AgentType
   cid       String
   fileType  String?
   fileSize  Int?

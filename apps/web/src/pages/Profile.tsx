@@ -5,6 +5,8 @@ import AnimatedBackground from '../components/AnimatedBackground';
 
 export default function Profile() {
   const [activeTab, setActiveTab] = useState('assets');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const stats = [
     { label: 'Rooms Created', value: '24', icon: TrendingUp },

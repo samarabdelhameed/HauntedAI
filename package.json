@@ -25,6 +25,8 @@
     "test:unit": "npm run test:unit --workspaces",
     "test:property": "npm run test:property --workspaces",
     "test:coverage": "npm run test:coverage --workspaces",
+    "test:scenario": "node test-scenario-complete.js",
+    "test:journey": "node test-user-journey.js",
     "test:load": "k6 run tests/load/scenario.js",
     "lint": "eslint . --ext .ts,.tsx",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
@@ -68,5 +70,10 @@
     "kiro"
   ],
   "author": "Your Name",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.13.2",
+    "eventsource": "^4.1.0",
+    "ws": "^8.18.3"
+  }
 }

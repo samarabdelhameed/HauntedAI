@@ -1,0 +1,65 @@
+# Alert Rules for HauntedAI
+# Managed by Kiro
+
+groups:
+  - name: hauntedai_alerts
+    rules:
+      # High error rate alert
+      - alert: HighErrorRate
+        expr: rate(hauntedai_http_request_errors_total[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value }} errors per second"
+
+      # High response time alert
+      - alert: HighResponseTime
+        expr: histogram_quantile(0.95, rate(hauntedai_http_request_duration_seconds_bucket[5m])) > 5
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High response time detected"
+          description: "95th percentile response time is {{ $value }} seconds"
+
+      # High memory usage alert
+      - alert: HighMemoryUsage
+        expr: hauntedai_memory_usage_bytes > 1000000000  # 1GB
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is {{ $value }} bytes"
+
+      # Agent failure alert
+      - alert: AgentFailures
+        expr: rate(hauntedai_agent_failures_total[5m]) > 0.05
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Agent failures detected"
+          description: "Agent {{ $labels.agent_type }} is failing at {{ $value }} failures per second"
+
+      # Service down alert
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service is down"
+          description: "Service {{ $labels.job }} is down"
+
+      # Too many active connections
+      - alert: TooManyConnections
+        expr: hauntedai_active_connections > 80
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Too many active connections"
+          description: "{{ $labels.type }} connections: {{ $value }}"

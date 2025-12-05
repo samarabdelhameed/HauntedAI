@@ -12,7 +12,9 @@
     "test:property": "jest --testPathPattern=\\.property\\.ts$",
     "test:coverage": "jest --coverage"
   },
-  "dependencies": {},
+  "dependencies": {
+    "prom-client": "^15.1.0"
+  },
   "devDependencies": {
     "@types/jest": "^29.5.8",
     "jest": "^29.7.0",

@@ -99,6 +99,33 @@ class Web3Manager {
       window.ethereum.on('chainChanged', callback);
     }
   }
+
+  async disconnectWallet(): Promise<boolean> {
+    try {
+      if (!await this.isMetaMaskInstalled()) {
+        return false;
+      }
+
+      // MetaMask doesn't have a direct disconnect method
+      // But we can clear the connection by removing event listeners
+      // The actual disconnect happens when user logs out from the app
+      return true;
+    } catch (error) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Failed to disconnect wallet:', error);
+      }
+      return false;
+    }
+  }
+
+  removeEventListeners() {
+    if (window.ethereum) {
+      // Remove all event listeners by cloning the object
+      // This is a workaround since MetaMask doesn't provide removeListener for all events
+      window.ethereum.removeAllListeners?.('accountsChanged');
+      window.ethereum.removeAllListeners?.('chainChanged');
+    }
+  }
 }
 
 export const web3Manager = new Web3Manager();

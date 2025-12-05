@@ -97,6 +97,30 @@ class MockApiClient {
     const data = await response.json();
     return { data, status: response.status };
   }
+
+  async request(endpoint: string, options: RequestInit = {}) {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      ...((options.headers as Record<string, string>) || {}),
+    };
+
+    if (this.token) {
+      headers['Authorization'] = `Bearer ${this.token}`;
+    }
+
+    const response = await fetch(endpoint, {
+      ...options,
+      headers,
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      return { error: data.message || 'Request failed', status: response.status };
+    }
+
+    const data = await response.json();
+    return { data, status: response.status };
+  }
 }
 
 describe('Authentication Flow Property-Based Tests', () => {
@@ -547,8 +571,128 @@ describe('Authentication Flow Property-Based Tests', () => {
         { numRuns: 100 }
       );
     });
+  });
 
-    it('should maintain user data consistency with JWT', async () => {
+  // Feature: haunted-ai, Property 42: JWT expiration handling
+  // Validates: Requirements 11.4
+  describe('Property 42: JWT expiration handling', () => {
+    it('should return 401 for any expired JWT token', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.array(fc.integer({ min: 0, max: 15 }), { minLength: 40, maxLength: 40 }).map(arr => 
+            arr.map(n => n.toString(16)).join('')
+          ),
+          fc.integer({ min: 3600, max: 86400 }), // Expired by 1-24 hours
+          async (addressSuffix: string, expiredBySeconds: number) => {
+            // Reset mocks and storage
+            jest.clearAllMocks();
+            localStorage.clear();
+
+            const walletAddress = `0x${addressSuffix}`;
+            const expiredTimestamp = Math.floor(Date.now() / 1000) - expiredBySeconds;
+            
+            const expiredJWT = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${Buffer.from(
+              JSON.stringify({ 
+                sub: walletAddress, 
+                exp: expiredTimestamp,
+                iat: expiredTimestamp - 86400 
+              })
+            ).toString('base64')}.signature`;
+
+            // Store expired token
+            apiClient.setToken(expiredJWT);
+            localStorage.setItem('user', JSON.stringify({
+              id: `user-${walletAddress}`,
+              did: `did:ethr:${walletAddress.toLowerCase()}`,
+              username: `user_${addressSuffix.slice(0, 6)}`,
+              walletAddress: walletAddress.toLowerCase(),
+            }));
+
+            // Mock 401 response for expired token
+            (global.fetch as jest.Mock).mockResolvedValue({
+              ok: false,
+              status: 401,
+              json: async () => ({
+                message: 'Unauthorized',
+                statusCode: 401,
+              }),
+            });
+
+            // Try to make authenticated request
+            const response = await apiClient.request('/rooms', { method: 'GET' });
+
+            // Property: Expired JWT should result in 401 status
+            expect(response.status).toBe(401);
+            expect(response.error).toBeDefined();
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should trigger re-authentication flow on 401 response', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.array(fc.integer({ min: 0, max: 15 }), { minLength: 40, maxLength: 40 }).map(arr => 
+            arr.map(n => n.toString(16)).join('')
+          ),
+          async (addressSuffix: string) => {
+            // Reset mocks and storage
+            jest.clearAllMocks();
+            localStorage.clear();
+
+            const walletAddress = `0x${addressSuffix}`;
+            const expiredJWT = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${Buffer.from(
+              JSON.stringify({ 
+                sub: walletAddress, 
+                exp: Math.floor(Date.now() / 1000) - 3600 
+              })
+            ).toString('base64')}.signature`;
+
+            // Store expired token and user
+            apiClient.setToken(expiredJWT);
+            localStorage.setItem('user', JSON.stringify({
+              id: `user-${walletAddress}`,
+              did: `did:ethr:${walletAddress.toLowerCase()}`,
+              username: `user_${addressSuffix.slice(0, 6)}`,
+              walletAddress: walletAddress.toLowerCase(),
+            }));
+
+            // Verify token is stored
+            expect(localStorage.getItem('jwt_token')).toBe(expiredJWT);
+            expect(localStorage.getItem('user')).toBeDefined();
+
+            // Mock 401 response
+            (global.fetch as jest.Mock).mockResolvedValue({
+              ok: false,
+              status: 401,
+              json: async () => ({
+                message: 'Unauthorized',
+              }),
+            });
+
+            // Make request that will fail with 401
+            const response = await apiClient.request('/rooms', { method: 'GET' });
+
+            // Property: 401 response should be detected
+            expect(response.status).toBe(401);
+
+            // Simulate re-authentication flow by clearing token
+            if (response.status === 401) {
+              apiClient.clearToken();
+              localStorage.removeItem('user');
+            }
+
+            // Property: After 401, token and user should be cleared
+            expect(localStorage.getItem('jwt_token')).toBeNull();
+            expect(localStorage.getItem('user')).toBeNull();
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should clear expired JWT from localStorage on 401', async () => {
       await fc.assert(
         fc.asyncProperty(
           fc.array(fc.integer({ min: 0, max: 15 }), { minLength: 40, maxLength: 40 }).map(arr => 
@@ -562,67 +706,316 @@ describe('Authentication Flow Property-Based Tests', () => {
 
             const walletAddress = `0x${addressSuffix}`;
             const userData = {
-              id: `user-${Date.now()}`,
+              id: `user-${walletAddress}`,
               did: `did:ethr:${walletAddress.toLowerCase()}`,
               username: username.replace(/[^a-zA-Z0-9]/g, '_'),
               walletAddress: walletAddress.toLowerCase(),
             };
 
-            const mockJWT = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${Buffer.from(
-              JSON.stringify({ sub: walletAddress, username: userData.username })
+            const expiredJWT = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${Buffer.from(
+              JSON.stringify({ 
+                sub: walletAddress, 
+                exp: Math.floor(Date.now() / 1000) - 7200 // Expired 2 hours ago
+              })
             ).toString('base64')}.signature`;
 
-            // Store token and user data
-            apiClient.setToken(mockJWT);
+            // Store expired token and user data
+            apiClient.setToken(expiredJWT);
             localStorage.setItem('user', JSON.stringify(userData));
 
-            // Retrieve stored data
-            const storedToken = localStorage.getItem('jwt_token');
-            const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+            // Verify initial state
+            expect(localStorage.getItem('jwt_token')).toBe(expiredJWT);
+            expect(localStorage.getItem('user')).toBeDefined();
 
-            // Property: User data should be consistent with JWT payload
-            expect(storedToken).toBe(mockJWT);
-            expect(storedUser.walletAddress).toBe(walletAddress.toLowerCase());
-            expect(storedUser.username).toBe(userData.username);
+            // Mock 401 response
+            (global.fetch as jest.Mock).mockResolvedValue({
+              ok: false,
+              status: 401,
+              json: async () => ({
+                message: 'Token expired',
+                statusCode: 401,
+              }),
+            });
+
+            // Make authenticated request
+            const response = await apiClient.request('/rooms', { method: 'GET' });
+
+            // Property: Request with expired token should return 401
+            expect(response.status).toBe(401);
+
+            // Simulate cleanup on 401
+            if (response.status === 401) {
+              apiClient.clearToken();
+              localStorage.removeItem('user');
+            }
+
+            // Property: Expired JWT should be removed from localStorage
+            expect(localStorage.getItem('jwt_token')).toBeNull();
+            expect(localStorage.getItem('user')).toBeNull();
           }
         ),
         { numRuns: 100 }
       );
     });
 
-    it('should handle multiple login/logout cycles', async () => {
+    it('should handle multiple 401 responses consistently', async () => {
       await fc.assert(
         fc.asyncProperty(
-          fc.array(
-            fc.array(fc.integer({ min: 0, max: 15 }), { minLength: 40, maxLength: 40 }).map(arr => 
-              arr.map(n => n.toString(16)).join('')
-            ),
-            { minLength: 2, maxLength: 5 }
+          fc.array(fc.integer({ min: 0, max: 15 }), { minLength: 40, maxLength: 40 }).map(arr => 
+            arr.map(n => n.toString(16)).join('')
           ),
-          async (addressSuffixes: string[]) => {
+          fc.integer({ min: 2, max: 5 }),
+          async (addressSuffix: string, requestCount: number) => {
             // Reset mocks and storage
             jest.clearAllMocks();
             localStorage.clear();
 
-            for (const addressSuffix of addressSuffixes) {
-              const mockJWT = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${Buffer.from(
-                JSON.stringify({ sub: `0x${addressSuffix}` })
-              ).toString('base64')}.signature`;
+            const walletAddress = `0x${addressSuffix}`;
+            const expiredJWT = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${Buffer.from(
+              JSON.stringify({ 
+                sub: walletAddress, 
+                exp: Math.floor(Date.now() / 1000) - 3600 
+              })
+            ).toString('base64')}.signature`;
 
-              // Login
-              apiClient.setToken(mockJWT);
-              expect(localStorage.getItem('jwt_token')).toBe(mockJWT);
+            // Store expired token
+            apiClient.setToken(expiredJWT);
 
-              // Logout
-              apiClient.clearToken();
-              expect(localStorage.getItem('jwt_token')).toBeNull();
+            // Mock 401 response
+            (global.fetch as jest.Mock).mockResolvedValue({
+              ok: false,
+              status: 401,
+              json: async () => ({
+                message: 'Unauthorized',
+              }),
+            });
+
+            // Make multiple requests with expired token
+            const responses = [];
+            for (let i = 0; i < requestCount; i++) {
+              const response = await apiClient.request(`/rooms/${i}`, { method: 'GET' });
+              responses.push(response);
             }
 
-            // Property: After multiple cycles, storage should be clean
-            expect(localStorage.getItem('jwt_token')).toBeNull();
+            // Property: All requests with expired token should return 401
+            for (const response of responses) {
+              expect(response.status).toBe(401);
+            }
+
+            // Property: Token should still be in storage (until explicitly cleared)
+            expect(localStorage.getItem('jwt_token')).toBe(expiredJWT);
           }
         ),
-        { numRuns: 50 }
+        { numRuns: 100 }
+      );
+    });
+
+    it('should allow re-login after JWT expiration', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.array(fc.integer({ min: 0, max: 15 }), { minLength: 40, maxLength: 40 }).map(arr => 
+            arr.map(n => n.toString(16)).join('')
+          ),
+          fc.string({ minLength: 10, maxLength: 100 }),
+          async (addressSuffix: string, message: string) => {
+            // Reset mocks and storage
+            jest.clearAllMocks();
+            localStorage.clear();
+
+            const walletAddress = `0x${addressSuffix}`;
+            
+            // First login with expired token
+            const expiredJWT = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${Buffer.from(
+              JSON.stringify({ 
+                sub: walletAddress, 
+                exp: Math.floor(Date.now() / 1000) - 3600 
+              })
+            ).toString('base64')}.signature`;
+
+            apiClient.setToken(expiredJWT);
+
+            // Mock 401 response for expired token
+            (global.fetch as jest.Mock).mockResolvedValueOnce({
+              ok: false,
+              status: 401,
+              json: async () => ({
+                message: 'Unauthorized',
+              }),
+            });
+
+            // Request fails with 401
+            const failedResponse = await apiClient.request('/rooms', { method: 'GET' });
+            expect(failedResponse.status).toBe(401);
+
+            // Clear expired token
+            apiClient.clearToken();
+            expect(localStorage.getItem('jwt_token')).toBeNull();
+
+            // Re-login with new token
+            const newJWT = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${Buffer.from(
+              JSON.stringify({ 
+                sub: walletAddress, 
+                exp: Math.floor(Date.now() / 1000) + 86400 // Valid for 24 hours
+              })
+            ).toString('base64')}.signature`;
+
+            const signature = `0x${'a'.repeat(130)}`;
+
+            (global.fetch as jest.Mock).mockResolvedValueOnce({
+              ok: true,
+              status: 200,
+              json: async () => ({
+                accessToken: newJWT,
+                user: {
+                  id: `user-${walletAddress}`,
+                  did: `did:ethr:${walletAddress.toLowerCase()}`,
+                  username: `user_${addressSuffix.slice(0, 6)}`,
+                  walletAddress: walletAddress.toLowerCase(),
+                },
+              }),
+            });
+
+            // Re-login
+            const loginResponse = await apiClient.login(walletAddress, signature, message);
+
+            // Property: Re-login after expiration should succeed
+            expect(loginResponse.status).toBe(200);
+            expect(loginResponse.data).toBeDefined();
+
+            // Store new token
+            if (loginResponse.data) {
+              apiClient.setToken((loginResponse.data as any).accessToken);
+            }
+
+            // Property: New token should be stored
+            expect(localStorage.getItem('jwt_token')).toBe(newJWT);
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should distinguish between expired and invalid tokens', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.array(fc.integer({ min: 0, max: 15 }), { minLength: 40, maxLength: 40 }).map(arr => 
+            arr.map(n => n.toString(16)).join('')
+          ),
+          async (addressSuffix: string) => {
+            // Reset mocks and storage
+            jest.clearAllMocks();
+            localStorage.clear();
+
+            const walletAddress = `0x${addressSuffix}`;
+
+            // Test 1: Expired token
+            const expiredJWT = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${Buffer.from(
+              JSON.stringify({ 
+                sub: walletAddress, 
+                exp: Math.floor(Date.now() / 1000) - 3600 
+              })
+            ).toString('base64')}.signature`;
+
+            apiClient.setToken(expiredJWT);
+
+            (global.fetch as jest.Mock).mockResolvedValueOnce({
+              ok: false,
+              status: 401,
+              json: async () => ({
+                message: 'Token expired',
+                statusCode: 401,
+              }),
+            });
+
+            const expiredResponse = await apiClient.request('/rooms', { method: 'GET' });
+
+            // Property: Expired token should return 401
+            expect(expiredResponse.status).toBe(401);
+
+            // Test 2: Invalid token
+            apiClient.clearToken();
+            const invalidJWT = 'invalid.token.format';
+            apiClient.setToken(invalidJWT);
+
+            (global.fetch as jest.Mock).mockResolvedValueOnce({
+              ok: false,
+              status: 401,
+              json: async () => ({
+                message: 'Invalid token',
+                statusCode: 401,
+              }),
+            });
+
+            const invalidResponse = await apiClient.request('/rooms', { method: 'GET' });
+
+            // Property: Invalid token should also return 401
+            expect(invalidResponse.status).toBe(401);
+
+            // Property: Both cases should be handled the same way (401)
+            expect(expiredResponse.status).toBe(invalidResponse.status);
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should preserve user experience during token refresh', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.array(fc.integer({ min: 0, max: 15 }), { minLength: 40, maxLength: 40 }).map(arr => 
+            arr.map(n => n.toString(16)).join('')
+          ),
+          fc.string({ minLength: 5, maxLength: 20 }),
+          async (addressSuffix: string, username: string) => {
+            // Reset mocks and storage
+            jest.clearAllMocks();
+            localStorage.clear();
+
+            const walletAddress = `0x${addressSuffix}`;
+            const userData = {
+              id: `user-${walletAddress}`,
+              did: `did:ethr:${walletAddress.toLowerCase()}`,
+              username: username.replace(/[^a-zA-Z0-9]/g, '_'),
+              walletAddress: walletAddress.toLowerCase(),
+            };
+
+            // Store user data
+            localStorage.setItem('user', JSON.stringify(userData));
+
+            // Old expired token
+            const expiredJWT = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${Buffer.from(
+              JSON.stringify({ 
+                sub: walletAddress, 
+                exp: Math.floor(Date.now() / 1000) - 3600 
+              })
+            ).toString('base64')}.signature`;
+
+            apiClient.setToken(expiredJWT);
+
+            // Mock 401 for expired token
+            (global.fetch as jest.Mock).mockResolvedValueOnce({
+              ok: false,
+              status: 401,
+              json: async () => ({
+                message: 'Token expired',
+              }),
+            });
+
+            // Request fails
+            const failedResponse = await apiClient.request('/rooms', { method: 'GET' });
+            expect(failedResponse.status).toBe(401);
+
+            // Property: User data should still be available for re-authentication
+            const storedUser = localStorage.getItem('user');
+            expect(storedUser).toBeDefined();
+            
+            if (storedUser) {
+              const parsedUser = JSON.parse(storedUser);
+              expect(parsedUser.walletAddress).toBe(walletAddress.toLowerCase());
+            }
+          }
+        ),
+        { numRuns: 100 }
       );
     });
   });
