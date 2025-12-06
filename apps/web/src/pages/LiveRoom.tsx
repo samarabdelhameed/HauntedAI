@@ -530,14 +530,53 @@ export default function LiveRoom() {
                           <div className="mb-2 rounded-lg overflow-hidden border border-[#FF6B00]/20">
                             <div style={{
                               width: '100%',
-                              height: '150px',
-                              background: 'linear-gradient(135deg, #1a0a0a 0%, #2a1a1a 50%, #1a0a0a 100%)',
+                              height: '200px',
+                              background: 'linear-gradient(135deg, #0a0a0a 0%, #1a0a1a 25%, #2a0a0a 50%, #1a0a1a 75%, #0a0a0a 100%)',
                               display: 'flex',
+                              flexDirection: 'column',
                               alignItems: 'center',
                               justifyContent: 'center',
-                              fontSize: '48px'
+                              position: 'relative',
+                              overflow: 'hidden'
                             }}>
-                              🏚️👻🕯️
+                              <div style={{
+                                position: 'absolute',
+                                top: '20%',
+                                left: '50%',
+                                transform: 'translateX(-50%)',
+                                fontSize: '64px',
+                                animation: 'float 3s ease-in-out infinite'
+                              }}>👻</div>
+                              <div style={{
+                                position: 'absolute',
+                                bottom: '20%',
+                                left: '20%',
+                                fontSize: '32px',
+                                opacity: 0.7
+                              }}>🏚️</div>
+                              <div style={{
+                                position: 'absolute',
+                                bottom: '20%',
+                                right: '20%',
+                                fontSize: '32px',
+                                opacity: 0.7
+                              }}>🕯️</div>
+                              <div style={{
+                                position: 'absolute',
+                                top: '50%',
+                                left: '50%',
+                                transform: 'translate(-50%, -50%)',
+                                width: '80%',
+                                height: '1px',
+                                background: 'linear-gradient(90deg, transparent, #FF6B00, transparent)',
+                                opacity: 0.3
+                              }}></div>
+                              <style>{`
+                                @keyframes float {
+                                  0%, 100% { transform: translateX(-50%) translateY(0px); }
+                                  50% { transform: translateX(-50%) translateY(-20px); }
+                                }
+                              `}</style>
                             </div>
                           </div>
                         )}

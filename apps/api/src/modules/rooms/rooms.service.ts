@@ -181,8 +181,8 @@ export class RoomsService {
       await this.emitLog(roomId, 'story', 'info', 'Generating spooky story from your input...');
       await this.sleep(3000);
       
-      // Generate rich story content based on user input
-      const storyContent = this.generateStoryFromInput(inputText);
+      // Generate story based DIRECTLY on user input using Groq
+      const storyContent = await this.generateStoryWithGroq(inputText);
       
       // Create story asset with content in metadata
       await this.prisma.asset.create({
@@ -290,6 +290,53 @@ export class RoomsService {
 
   private sleep(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  /**
+   * Generate horror story using Groq AI based on user input
+   */
+  private async generateStoryWithGroq(userInput: string): Promise<string> {
+    try {
+      const groqApiKey = process.env.GROQ_API_KEY;
+      
+      if (!groqApiKey || groqApiKey === 'your-groq-api-key-here') {
+        return `${userInput}\n\nA chilling horror story unfolds...`;
+      }
+
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${groqApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'llama-3.3-70b-versatile',
+          messages: [
+            {
+              role: 'system',
+              content: 'You are a master horror storyteller. Create atmospheric, terrifying stories that send chills down the spine. Write in a vivid, immersive style.',
+            },
+            {
+              role: 'user',
+              content: `Write a complete horror story (300-500 words) based on this concept: "${userInput}". Make it atmospheric, terrifying, and immersive. Include vivid descriptions and a shocking twist.`,
+            },
+          ],
+          temperature: 0.9,
+          max_tokens: 800,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Groq API error: ${response.statusText}`);
+      }
+
+      const data: any = await response.json();
+      return data.choices?.[0]?.message?.content || `${userInput}\n\nA horror story begins...`;
+      
+    } catch (error) {
+      console.error('Error generating story:', error);
+      return `${userInput}\n\nA chilling tale unfolds in the darkness...`;
+    }
   }
 
   /**
