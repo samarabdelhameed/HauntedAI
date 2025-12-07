@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ending Screen Preview - HauntedAI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0a1a 25%, #2a0a0a 50%, #1a0a1a 75%, #0a0a0a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            font-size: 30px;
+            opacity: 0;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+            50% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 1;
+            }
+        }
+
+        .modal {
+            background: rgba(20, 20, 30, 0.95);
+            border: 3px solid #FF6B00;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 800px;
+            width: 90%;
+            position: relative;
+            box-shadow: 0 0 50px rgba(255, 107, 0, 0.5);
+            animation: slideIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: scale(0.8) translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .glow {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 107, 0, 0.2), rgba(255, 0, 64, 0.2));
+            border-radius: 20px;
+            filter: blur(30px);
+            z-index: -1;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 48px;
+            color: #FF6B00;
+            text-shadow: 0 0 20px rgba(255, 107, 0, 0.8);
+            margin-bottom: 10px;
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% {
+                text-shadow: 0 0 20px rgba(255, 107, 0, 0.8);
+            }
+            50% {
+                text-shadow: 0 0 40px rgba(255, 107, 0, 1);
+            }
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 20px;
+            color: #ccc;
+            margin-bottom: 30px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat {
+            background: rgba(255, 107, 0, 0.1);
+            border: 1px solid rgba(255, 107, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            animation: popIn 0.5s ease-out;
+            animation-fill-mode: both;
+        }
+
+        .stat:nth-child(1) { animation-delay: 0.6s; }
+        .stat:nth-child(2) { animation-delay: 0.7s; }
+        .stat:nth-child(3) { animation-delay: 0.8s; }
+        .stat:nth-child(4) { animation-delay: 0.9s; }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .stat-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            color: #FF6B00;
+            font-weight: bold;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: fadeIn 1s ease-out;
+            animation-delay: 1s;
+            animation-fill-mode: both;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #FF6B00, #FF8C00);
+            color: white;
+            box-shadow: 0 0 30px rgba(255, 107, 0, 0.6);
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 50px rgba(255, 107, 0, 0.9);
+        }
+
+        .btn-secondary {
+            background: #8B5CF6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            transform: scale(1.05);
+            background: #7C3AED;
+        }
+
+        .links {
+            text-align: center;
+            color: #999;
+            font-size: 14px;
+            animation: fadeIn 1.2s ease-out;
+            animation-delay: 1.2s;
+            animation-fill-mode: both;
+        }
+
+        .links a {
+            color: #999;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .links a:hover {
+            color: white;
+        }
+
+        .message {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            margin-top: 20px;
+            font-size: 14px;
+            animation: fadeIn 1.4s ease-out;
+            animation-delay: 1.4s;
+            animation-fill-mode: both;
+        }
+
+        .lang-switch {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 107, 0, 0.2);
+            border: 1px solid #FF6B00;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .lang-switch:hover {
+            background: rgba(255, 107, 0, 0.4);
+        }
+
+        /* Arabic RTL styles */
+        [dir="rtl"] .modal {
+            direction: rtl;
+        }
+    </style>
+</head>
+<body>
+    <button class="lang-switch" onclick="toggleLanguage()">🌐 عربي / English</button>
+
+    <!-- Floating particles -->
+    <div id="particles"></div>
+
+    <!-- Main modal -->
+    <div class="modal">
+        <div class="glow"></div>
+        
+        <h1 id="title">🎉 Mission Complete! 🎉</h1>
+        <p class="subtitle" id="subtitle">Your haunted experience is ready!</p>
+
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-icon">📖</div>
+                <div class="stat-label" id="stat-story">Story</div>
+                <div class="stat-value">✓</div>
+            </div>
+            <div class="stat">
+                <div class="stat-icon">🎨</div>
+                <div class="stat-label" id="stat-image">Image</div>
+                <div class="stat-value">✓</div>
+            </div>
+            <div class="stat">
+                <div class="stat-icon">🎮</div>
+                <div class="stat-label" id="stat-game">Game</div>
+                <div class="stat-value">✓</div>
+            </div>
+            <div class="stat">
+                <div class="stat-icon">🚀</div>
+                <div class="stat-label" id="stat-deploy">Deploy</div>
+                <div class="stat-value">✓</div>
+            </div>
+        </div>
+
+        <div class="buttons">
+            <button class="btn btn-primary" onclick="playGame()">
+                <span id="btn-play">🎮 Play Your Game Now!</span>
+            </button>
+            <button class="btn btn-secondary" onclick="share()">
+                <span id="btn-share">📤 Share Your Creation</span>
+            </button>
+        </div>
+
+        <div class="links">
+            <a onclick="viewDetails()" id="link-details">View Details</a>
+            <span> | </span>
+            <a onclick="backToDashboard()" id="link-dashboard">Back to Dashboard</a>
+        </div>
+
+        <p class="message" id="message">
+            "The spirits are pleased with your creation..." 👻✨
+        </p>
+    </div>
+
+    <script>
+        // Create floating particles
+        const emojis = ['🎃', '👻', '🦇', '💀', '🕷️', '🌙'];
+        const particlesContainer = document.getElementById('particles');
+        
+        for (let i = 0; i < 20; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.textContent = emojis[i % emojis.length];
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.top = Math.random() * 100 + '%';
+            particle.style.animationDelay = (i * 0.2) + 's';
+            particlesContainer.appendChild(particle);
+        }
+
+        // Translations
+        const translations = {
+            en: {
+                title: '🎉 Mission Complete! 🎉',
+                subtitle: 'Your haunted experience is ready!',
+                statStory: 'Story',
+                statImage: 'Image',
+                statGame: 'Game',
+                statDeploy: 'Deploy',
+                btnPlay: '🎮 Play Your Game Now!',
+                btnShare: '📤 Share Your Creation',
+                linkDetails: 'View Details',
+                linkDashboard: 'Back to Dashboard',
+                message: '"The spirits are pleased with your creation..." 👻✨'
+            },
+            ar: {
+                title: '🎉 المهمة مكتملة! 🎉',
+                subtitle: 'تجربتك المخيفة جاهزة!',
+                statStory: 'قصة',
+                statImage: 'صورة',
+                statGame: 'لعبة',
+                statDeploy: 'نشر',
+                btnPlay: '🎮 العب لعبتك الآن!',
+                btnShare: '📤 شارك إبداعك',
+                linkDetails: 'عرض التفاصيل',
+                linkDashboard: 'العودة للوحة التحكم',
+                message: '"الأرواح راضية عن إبداعك..." 👻✨'
+            }
+        };
+
+        let currentLang = 'en';
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'ar' : 'en';
+            document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+            
+            const t = translations[currentLang];
+            document.getElementById('title').textContent = t.title;
+            document.getElementById('subtitle').textContent = t.subtitle;
+            document.getElementById('stat-story').textContent = t.statStory;
+            document.getElementById('stat-image').textContent = t.statImage;
+            document.getElementById('stat-game').textContent = t.statGame;
+            document.getElementById('stat-deploy').textContent = t.statDeploy;
+            document.getElementById('btn-play').textContent = t.btnPlay;
+            document.getElementById('btn-share').textContent = t.btnShare;
+            document.getElementById('link-details').textContent = t.linkDetails;
+            document.getElementById('link-dashboard').textContent = t.linkDashboard;
+            document.getElementById('message').textContent = t.message;
+        }
+
+        function playGame() {
+            alert('🎮 Opening your game...\n\nIn the real app, this would launch your generated game!');
+        }
+
+        function share() {
+            const text = currentLang === 'ar' 
+                ? 'لقد أنشأت تجربة ذكاء اصطناعي مخيفة على HauntedAI! 🎃👻'
+                : 'I just created a haunted AI experience on HauntedAI! 🎃👻';
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'HauntedAI Creation',
+                    text: text,
+                    url: window.location.href
+                }).catch(() => {
+                    navigator.clipboard.writeText(text + '\n' + window.location.href);
+                    alert('📋 Link copied to clipboard!');
+                });
+            } else {
+                navigator.clipboard.writeText(text + '\n' + window.location.href);
+                alert('📋 Link copied to clipboard!');
+            }
+        }
+
+        function viewDetails() {
+            alert('👁️ Viewing details...\n\nIn the real app, this would show your generated assets!');
+        }
+
+        function backToDashboard() {
+            alert('🏠 Going back to dashboard...\n\nIn the real app, this would navigate to the dashboard!');
+        }
+
+        // Play success sound (simulated)
+        console.log('🔊 Success sound would play here!');
+    </script>
+</body>
+</html>
