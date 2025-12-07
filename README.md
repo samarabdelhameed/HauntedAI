@@ -352,7 +352,66 @@ streamLogs(@Param('id') roomId: string): Observable<MessageEvent> {
 ```
 
 
-### 4. Blockchain Integration
+### 4. Celebration Ending Screen 🎉
+
+**New Feature: Automated Success Celebration**
+
+When a workflow completes successfully, users are greeted with an immersive celebration screen featuring:
+
+**Visual Experience:**
+- 20 animated Halloween emoji particles (🎃👻🦇💀🕷️🌙) floating across the screen
+- Orange glow effects with glass morphism design
+- Smooth spring animations powered by Framer Motion
+- Completion stats grid showing Story, Image, Game, and Deploy status
+
+**Interactive Elements:**
+- **Play Game Button**: Launches the generated game (prioritizes Vercel deployment)
+- **Share Button**: Native share API with clipboard fallback
+- **View Details**: Returns to full room view
+- **Back to Dashboard**: Quick navigation to create new projects
+
+**Technical Implementation:**
+```typescript
+// Auto-triggers 2 seconds after workflow completion
+if (roomData?.status === 'done' && roomData?.assets?.length > 0) {
+  setTimeout(() => {
+    setShowEndingScreen(true);
+    soundManager.play('success');
+  }, 2000);
+}
+```
+
+**Internationalization:**
+- Full Arabic and English translations
+- RTL support for Arabic interface
+- Culturally appropriate celebration messages
+
+**User Experience Flow:**
+```
+Workflow Complete
+    │
+    ▼
+Wait 2 seconds (view final logs)
+    │
+    ▼
+🎉 Ending Screen Appears
+    │
+    ├─► Play Game (Vercel or local)
+    ├─► Share on Social Media
+    ├─► View Asset Details
+    └─► Return to Dashboard
+```
+
+**Preview:**
+
+![Ending Screen Preview](./ending-screen-preview.svg)
+
+**Documentation:**
+- [English Guide](./ENDING_SCREEN_FEATURE.md)
+- [Arabic Guide (دليل عربي)](./ENDING_SCREEN_AR.md)
+
+
+### 5. Blockchain Integration
 
 **Smart Contracts:**
 
