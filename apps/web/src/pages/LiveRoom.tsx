@@ -25,6 +25,7 @@ export default function LiveRoom() {
   const [isLoading, setIsLoading] = useState(true);
   const [storyText, setStoryText] = useState<string | null>(null);
   const [isLoadingStory, setIsLoadingStory] = useState(false);
+  const [showEndingScreen, setShowEndingScreen] = useState(false);
   const logsEndRef = useRef<HTMLDivElement>(null);
   const sseRef = useRef<EventSource | null>(null);
   const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -84,10 +85,19 @@ export default function LiveRoom() {
       }
       
       // Stop refresh interval if room is done or error
-      if (response.data?.status === 'done' || response.data?.status === 'error') {
+      const roomData = response.data as any;
+      if (roomData?.status === 'done' || roomData?.status === 'error') {
         if (refreshIntervalRef.current) {
           clearInterval(refreshIntervalRef.current);
           refreshIntervalRef.current = null;
+        }
+        
+        // Show ending screen after 2 seconds when workflow completes successfully
+        if (roomData?.status === 'done' && roomData?.assets?.length > 0) {
+          setTimeout(() => {
+            setShowEndingScreen(true);
+            soundManager.play('success');
+          }, 2000);
         }
       }
     } catch (error) {
@@ -285,9 +295,236 @@ export default function LiveRoom() {
     return null;
   }
 
+  // Ending Screen Component
+  const EndingScreen = () => {
+    const deployAsset = room?.assets?.find((a: any) => a.agentType === 'deploy');
+    const codeAsset = room?.assets?.find((a: any) => a.agentType === 'code');
+    const storyAsset = room?.assets?.find((a: any) => a.agentType === 'story');
+    const imageAsset = room?.assets?.find((a: any) => a.agentType === 'asset');
+    
+    let deployUrl = null;
+    if (deployAsset?.metadata) {
+      try {
+        const metadata = typeof deployAsset.metadata === 'string' 
+          ? JSON.parse(deployAsset.metadata) 
+          : deployAsset.metadata;
+        deployUrl = metadata?.url;
+      } catch (e) {}
+    }
+
+    return (
+      <motion.div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      >
+        <AnimatedBackground />
+        
+        {/* Celebration particles */}
+        {[...Array(20)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-4 h-4 text-2xl"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+            }}
+            animate={{
+              y: [0, -100, -200],
+              opacity: [0, 1, 0],
+              scale: [0, 1.5, 0],
+              rotate: [0, 360],
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              delay: i * 0.2,
+            }}
+          >
+            {['🎃', '👻', '🦇', '💀', '🕷️', '🌙'][i % 6]}
+          </motion.div>
+        ))}
+
+        <motion.div
+          className="glass max-w-4xl w-full mx-4 p-8 rounded-2xl border-2 border-[#FF6B00] relative overflow-hidden"
+          initial={{ scale: 0.8, y: 50 }}
+          animate={{ scale: 1, y: 0 }}
+          transition={{ type: 'spring', duration: 0.8 }}
+        >
+          {/* Glow effect */}
+          <div className="absolute inset-0 bg-gradient-to-br from-[#FF6B00]/20 to-[#FF0040]/20 blur-3xl" />
+          
+          <div className="relative z-10">
+            {/* Title */}
+            <motion.div
+              className="text-center mb-8"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              <h1 className="text-6xl font-creepster text-[#FF6B00] mb-4"
+                style={{
+                  textShadow: '0 0 20px rgba(255, 107, 0, 0.8), 0 0 40px rgba(255, 107, 0, 0.5)'
+                }}
+              >
+                🎉 Mission Complete! 🎉
+              </h1>
+              <p className="text-2xl text-gray-300">
+                Your haunted experience is ready!
+              </p>
+            </motion.div>
+
+            {/* Stats Grid */}
+            <motion.div
+              className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+            >
+              {[
+                { icon: '📖', label: 'Story', value: storyAsset ? '✓' : '...' },
+                { icon: '🎨', label: 'Image', value: imageAsset ? '✓' : '...' },
+                { icon: '🎮', label: 'Game', value: codeAsset ? '✓' : '...' },
+                { icon: '🚀', label: 'Deploy', value: deployAsset ? '✓' : '...' },
+              ].map((stat, i) => (
+                <motion.div
+                  key={i}
+                  className="bg-white/5 p-4 rounded-lg text-center border border-[#FF6B00]/30"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.6 + i * 0.1, type: 'spring' }}
+                >
+                  <div className="text-3xl mb-2">{stat.icon}</div>
+                  <div className="text-sm text-gray-400">{stat.label}</div>
+                  <div className="text-xl font-bold text-[#FF6B00]">{stat.value}</div>
+                </motion.div>
+              ))}
+            </motion.div>
+
+            {/* Action Buttons */}
+            <motion.div
+              className="flex flex-col sm:flex-row gap-4 justify-center mb-6"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.9 }}
+            >
+              {deployUrl && (
+                <motion.a
+                  href={deployUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-8 py-4 bg-gradient-to-r from-[#FF6B00] to-[#FF8C00] rounded-lg font-bold text-lg shadow-[0_0_30px_rgba(255,107,0,0.6)] hover:shadow-[0_0_50px_rgba(255,107,0,0.9)] transition-all flex items-center justify-center gap-3"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => soundManager.play('click')}
+                >
+                  <Play className="w-6 h-6" />
+                  🎮 Play Your Game Now!
+                </motion.a>
+              )}
+              
+              {codeAsset && !deployUrl && (
+                <motion.button
+                  onClick={() => {
+                    try {
+                      const metadata = typeof codeAsset.metadata === 'string' 
+                        ? JSON.parse(codeAsset.metadata) 
+                        : codeAsset.metadata;
+                      
+                      if (metadata?.gameCode) {
+                        const gameWindow = window.open('', '_blank');
+                        if (gameWindow) {
+                          gameWindow.document.write(metadata.gameCode);
+                          gameWindow.document.close();
+                        }
+                      }
+                    } catch (e) {
+                      console.error('Error opening game:', e);
+                    }
+                    soundManager.play('click');
+                  }}
+                  className="px-8 py-4 bg-gradient-to-r from-[#FF6B00] to-[#FF8C00] rounded-lg font-bold text-lg shadow-[0_0_30px_rgba(255,107,0,0.6)] hover:shadow-[0_0_50px_rgba(255,107,0,0.9)] transition-all flex items-center justify-center gap-3"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Play className="w-6 h-6" />
+                  🎮 Play Your Game!
+                </motion.button>
+              )}
+
+              <motion.button
+                onClick={() => {
+                  const shareText = `I just created a haunted AI experience on HauntedAI! 🎃👻\n\nCheck it out: ${window.location.href}`;
+                  if (navigator.share) {
+                    navigator.share({
+                      title: 'My HauntedAI Creation',
+                      text: shareText,
+                      url: window.location.href,
+                    });
+                  } else {
+                    navigator.clipboard.writeText(shareText);
+                    alert('Link copied to clipboard!');
+                  }
+                  soundManager.play('success');
+                }}
+                className="px-8 py-4 bg-purple-600 hover:bg-purple-700 rounded-lg font-bold text-lg transition-all flex items-center justify-center gap-3"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                📤 Share Your Creation
+              </motion.button>
+            </motion.div>
+
+            {/* Close Button */}
+            <motion.div
+              className="text-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.1 }}
+            >
+              <button
+                onClick={() => {
+                  setShowEndingScreen(false);
+                  soundManager.play('click');
+                }}
+                className="text-gray-400 hover:text-white transition-all underline"
+              >
+                View Details
+              </button>
+              <span className="mx-4 text-gray-600">|</span>
+              <button
+                onClick={() => {
+                  soundManager.play('click');
+                  navigate('/dashboard');
+                }}
+                className="text-gray-400 hover:text-white transition-all underline"
+              >
+                Back to Dashboard
+              </button>
+            </motion.div>
+
+            {/* Fun message */}
+            <motion.p
+              className="text-center text-gray-500 text-sm mt-6 italic"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.3 }}
+            >
+              "The spirits are pleased with your creation..." 👻✨
+            </motion.p>
+          </div>
+        </motion.div>
+      </motion.div>
+    );
+  };
+
   return (
     <div className="min-h-screen relative">
       <AnimatedBackground />
+
+      {/* Show ending screen overlay */}
+      {showEndingScreen && <EndingScreen />}
 
       {[...Array(3)].map((_, i) => (
         <FloatingGhost key={i} delay={i * 0.7} size={80} />

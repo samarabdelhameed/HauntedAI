@@ -65,7 +65,23 @@
     "noLogs": "Waiting for logs... Start the workflow to see agent activity.",
     "copy": "Copy",
     "copied": "CID copied to clipboard!",
-    "close": "Close"
+    "close": "Close",
+    "ending": {
+      "title": "🎉 Mission Complete! 🎉",
+      "subtitle": "Your haunted experience is ready!",
+      "stats": {
+        "story": "Story",
+        "image": "Image",
+        "game": "Game",
+        "deploy": "Deploy"
+      },
+      "playGame": "🎮 Play Your Game Now!",
+      "share": "📤 Share Your Creation",
+      "viewDetails": "View Details",
+      "backToDashboard": "Back to Dashboard",
+      "spiritsMessage": "\"The spirits are pleased with your creation...\" 👻✨",
+      "shareText": "I just created a haunted AI experience on HauntedAI! 🎃👻"
+    }
   },
   "explore": {
     "title": "Haunted Gallery",
