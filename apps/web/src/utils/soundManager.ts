@@ -17,9 +17,15 @@ class SoundManager {
     };
 
     Object.entries(soundUrls).forEach(([key, url]) => {
-      const audio = new Audio(url);
-      audio.volume = 0.3;
-      this.sounds.set(key, audio);
+      try {
+        const audio = new Audio(url);
+        audio.volume = 0.3;
+        // Preload to catch errors early
+        audio.load();
+        this.sounds.set(key, audio);
+      } catch (error) {
+        console.warn(`Failed to load sound: ${key}`, error);
+      }
     });
   }
 
