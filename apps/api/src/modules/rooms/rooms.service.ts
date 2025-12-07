@@ -207,9 +207,12 @@ export class RoomsService {
       // Asset Agent
       await this.sleep(2000);
       await this.emitLog(roomId, 'asset', 'info', 'Creating haunting image for your story...');
+      
+      // Generate image based on story using Groq AI
+      const imagePrompt = await this.generateImagePromptFromStory(storyContent, inputText);
       await this.sleep(4000);
       
-      // Create image asset
+      // Create image asset with relevant prompt
       await this.prisma.asset.create({
         data: {
           roomId,
@@ -220,11 +223,15 @@ export class RoomsService {
             width: 1024,
             height: 1024,
             style: 'dark gothic horror',
+            prompt: imagePrompt,
+            basedOnStory: storyContent.substring(0, 200),
           }),
         },
       });
       
-      await this.emitLog(roomId, 'asset', 'success', 'Image generated and uploaded to IPFS!');
+      await this.emitLog(roomId, 'asset', 'success', 'Image generated and uploaded to IPFS!', {
+        prompt: imagePrompt.substring(0, 100),
+      });
 
       // Code Agent
       await this.sleep(2000);
@@ -336,6 +343,54 @@ export class RoomsService {
     } catch (error) {
       console.error('Error generating story:', error);
       return `${userInput}\n\nA chilling tale unfolds in the darkness...`;
+    }
+  }
+
+  /**
+   * Generate image prompt from story using AI
+   */
+  private async generateImagePromptFromStory(story: string, userInput: string): Promise<string> {
+    try {
+      const groqApiKey = process.env.GROQ_API_KEY;
+      
+      if (!groqApiKey || groqApiKey === 'your-groq-api-key-here') {
+        return `Dark horror scene: ${userInput}, gothic atmosphere, haunting, cinematic lighting`;
+      }
+
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${groqApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'llama-3.3-70b-versatile',
+          messages: [
+            {
+              role: 'system',
+              content: 'You are an expert at creating detailed image prompts for horror art. Create vivid, atmospheric descriptions.',
+            },
+            {
+              role: 'user',
+              content: `Based on this horror story, create a detailed image prompt (50-100 words) for DALL-E that captures the most terrifying scene:\n\n${story.substring(0, 500)}\n\nFocus on: atmosphere, lighting, key horror elements, and visual style. Make it cinematic and terrifying.`,
+            },
+          ],
+          temperature: 0.8,
+          max_tokens: 200,
+        }),
+      });
+
+      if (!response.ok) {
+        return `Dark horror scene based on: ${userInput}, gothic atmosphere, haunting, dramatic lighting`;
+      }
+
+      const data: any = await response.json();
+      const prompt = data.choices?.[0]?.message?.content || `Horror scene: ${userInput}`;
+      return prompt.trim();
+      
+    } catch (error) {
+      console.error('Error generating image prompt:', error);
+      return `Dark horror scene: ${userInput}, gothic atmosphere, haunting, cinematic lighting`;
     }
   }
 

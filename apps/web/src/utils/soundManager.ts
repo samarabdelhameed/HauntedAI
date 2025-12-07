@@ -28,9 +28,12 @@ class SoundManager {
 
     const sound = this.sounds.get(soundName);
     if (sound) {
-      sound.currentTime = 0;
-      sound.play().catch((error) => {
-        console.log('Sound play failed (user interaction required):', soundName);
+      // Clone the audio to allow overlapping sounds
+      const audioClone = sound.cloneNode() as HTMLAudioElement;
+      audioClone.volume = sound.volume;
+      audioClone.play().catch((error) => {
+        // Silently fail - browser might block autoplay
+        console.debug('Sound play blocked:', soundName);
       });
     }
   }

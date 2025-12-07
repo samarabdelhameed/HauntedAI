@@ -114,10 +114,16 @@ export default function LiveRoom() {
           setLogs((prev) => [...prev, log]);
           
           // Play sound based on log level
-          if (log.level === 'success') {
-            soundManager.play('success');
-          } else if (log.level === 'error') {
-            soundManager.play('error');
+          try {
+            if (log.level === 'success') {
+              soundManager.play('success');
+            } else if (log.level === 'error') {
+              soundManager.play('error');
+            } else if (log.level === 'info' && log.message.includes('starting')) {
+              soundManager.play('hover');
+            }
+          } catch (e) {
+            // Sound might not be ready yet
           }
         },
         (error) => {
@@ -135,7 +141,13 @@ export default function LiveRoom() {
     if (!id) return;
 
     setIsStarting(true);
-    soundManager.play('click');
+    
+    // Enable sound on first user interaction
+    try {
+      soundManager.play('click');
+    } catch (e) {
+      console.log('Sound not ready yet');
+    }
 
     try {
       const response = await apiClient.startRoom(id);
