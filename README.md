@@ -9,6 +9,18 @@
 [![Blockchain](https://img.shields.io/badge/Blockchain-BNB_Testnet-purple.svg)](https://testnet.bscscan.com/)
 [![Test Coverage](https://img.shields.io/badge/Coverage-93%25-brightgreen.svg)](./coverage)
 [![Property Tests](https://img.shields.io/badge/Property_Tests-152-blue.svg)](./.kiro/specs)
+[![Deploy](https://img.shields.io/badge/Deploy-Vercel-black.svg)](https://web-bpn9jfc9h-samarabdelhameeds-projects-df99c328.vercel.app)
+
+## 🚀 Live Demo
+
+**[View Live Application on Vercel →](https://web-bpn9jfc9h-samarabdelhameeds-projects-df99c328.vercel.app)**
+
+Experience the full HauntedAI platform with:
+- 🎃 Interactive AI agent orchestration
+- 👻 Real-time workflow visualization
+- 🎮 Generated mini-games
+- 🎉 Celebration ending screen
+- 🌍 Arabic & English support
 
 ---
 
@@ -1368,10 +1380,17 @@ Test result: ok. 45 passed; 0 failed; finished in 2.34s
 
 ### Live Application
 
-- **Frontend**: https://haunted-ai.vercel.app
-- **API Documentation**: https://api.hauntedai.com/docs
-- **Monitoring Dashboard**: https://monitoring.hauntedai.com
-- **Demo Video**: [Watch on YouTube (3 minutes)](https://www.youtube.com/watch?v=R9J-HG4zsGM)
+- **Frontend (Vercel)**: [https://web-bpn9jfc9h-samarabdelhameeds-projects-df99c328.vercel.app](https://web-bpn9jfc9h-samarabdelhameeds-projects-df99c328.vercel.app)
+- **GitHub Repository**: [https://github.com/samarabdelhameed/HauntedAI](https://github.com/samarabdelhameed/HauntedAI)
+- **Vercel Dashboard**: [View Deployment Status](https://vercel.com/samarabdelhameeds-projects-df99c328/web)
+
+### Features Available in Live Demo
+
+✅ **Celebration Ending Screen** - New feature with animated particles and sound effects
+✅ **Multi-language Support** - Full Arabic and English translations
+✅ **Real-time Visualization** - Live agent workflow with Three.js effects
+✅ **Interactive UI** - Responsive design for all devices
+✅ **Sound Effects** - Immersive audio experience
 
 ### Deployed Smart Contracts (BNB Testnet)
 
