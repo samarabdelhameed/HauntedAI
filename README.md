@@ -15,7 +15,19 @@
 
 **[View Live Application on Vercel →](https://web-bpn9jfc9h-samarabdelhameeds-projects-df99c328.vercel.app)**
 
-Experience the full HauntedAI platform with:
+### 🎥 Video Demo
+
+**[Watch Demo Video on YouTube (3 minutes) →](https://www.youtube.com/watch?v=CTUP1QWtChE)**
+
+See HauntedAI in action with a complete walkthrough of:
+- 🎬 Full workflow demonstration
+- 🤖 AI agents working together
+- 🎨 Real-time content generation
+- 🎮 Interactive game creation
+- 🎉 Celebration ending screen
+
+### ✨ Experience Features
+
 - 🎃 Interactive AI agent orchestration
 - 👻 Real-time workflow visualization
 - 🎮 Generated mini-games
@@ -1381,6 +1393,7 @@ Test result: ok. 45 passed; 0 failed; finished in 2.34s
 ### Live Application
 
 - **Frontend (Vercel)**: [https://web-bpn9jfc9h-samarabdelhameeds-projects-df99c328.vercel.app](https://web-bpn9jfc9h-samarabdelhameeds-projects-df99c328.vercel.app)
+- **Demo Video**: [Watch on YouTube (3 minutes)](https://www.youtube.com/watch?v=CTUP1QWtChE) 🎥
 - **GitHub Repository**: [https://github.com/samarabdelhameed/HauntedAI](https://github.com/samarabdelhameed/HauntedAI)
 - **Vercel Dashboard**: [View Deployment Status](https://vercel.com/samarabdelhameeds-projects-df99c328/web)
 
